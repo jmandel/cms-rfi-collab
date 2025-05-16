@@ -22,12 +22,37 @@ body {
   margin-bottom: 30px;
   color: white;
   text-align: center;
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Center title */
+  align-items: center; /* Vertically align items */
+  position: relative; /* For absolute positioning of the about link */
 }
 
 .App-header h1 {
   margin: 0;
   font-size: 2em;
-  font-weight: 500; /* Slightly less bold if needed */
+  font-weight: 500;
+}
+
+.about-link {
+  color: white;
+  text-decoration: none;
+  font-size: 0.9em; /* Adjusted for text to be less dominant than title */
+  font-weight: 500;
+  position: absolute;
+  right: 25px; /* Slightly more spacing from edge */
+  top: 50%;
+  transform: translateY(-50%);
+  padding: 6px 10px; /* Give it a bit more of a button feel */
+  border: 1px solid transparent; /* For hover effect */
+  border-radius: 4px;
+  transition: background-color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.about-link:hover {
+  opacity: 1;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.3);
 }
 
 footer {
