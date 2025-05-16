@@ -60,7 +60,7 @@ function App() {
       <footer>
         <p>
           The RFI responses and ideas compiled here are curated by Josh Mandel, MD. 
-          Unless otherwise specified within an individual contribution, they primarily represent his personal perspectives and recommendations. 
+          Unless otherwise specified within an individual contribution, they represent his personal perspectives and recommendations. 
           This is an open, collaborative effort, and contributions from others are welcome. 
           These views do not necessarily represent the official positions of Microsoft or any other organization.
         </p>

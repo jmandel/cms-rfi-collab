@@ -1,4 +1,4 @@
-# CMS RFI SMART Response Browser
+# CMS RFI: Draft Response Browser
 
 ## Introduction: Responding to the CMS Health Technology Ecosystem RFI
 
@@ -6,7 +6,7 @@ In May 2025, The Centers for Medicare & Medicaid Services (CMS) and ASTP/ONC rel
 
 This project, the **CMS RFI SMART Response Browser**, is part of an open, collaborative effort to draft and share recommendations in response to this RFI. The primary collection of these responses and ideas is managed in the `jmandel/cms-rfi-collab` GitHub repository.
 
-**Disclaimer:** The RFI responses and ideas compiled here are curated by Josh Mandel, MD. Unless otherwise specified within an individual contribution, they primarily represent his personal perspectives and recommendations. This is an open, collaborative effort, and contributions from others are welcome. These views do not necessarily represent the official positions of Microsoft or any other organization.
+**Disclaimer:** The RFI responses and ideas compiled here are curated by Josh Mandel, MD. Unless otherwise specified within an individual contribution, they represent his personal perspectives and recommendations. This is an open, collaborative effort, and contributions from others are welcome. These views do not necessarily represent the official positions of Microsoft or any other organization.
 
 ## Purpose of this Web Application
 
