@@ -1,69 +1,95 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { RfiPoint, CategoriesHierarchy, RfiStructure, RfiSection, RfiSubsection, RfiQuestion } from '../types';
+import { ProcessedRfiPoint, CategoriesHierarchy, RfiStructure, RfiSection, RfiSubsection, RfiQuestion } from '../types';
 import FilterPanel from './FilterPanel';
 import ResponseCard from './ResponseCard';
 
 interface ResponseBrowserPageProps {
-  allRfiPoints: RfiPoint[];
+  allRfiPoints: ProcessedRfiPoint[];
   categoriesHierarchy: CategoriesHierarchy;
   rfiStructure: RfiStructure;
 }
 
 const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints, categoriesHierarchy, rfiStructure }) => {
-  // Initialize activeFilters from URL query parameters
-  const getFiltersFromUrl = (): Set<string> => {
-    const params = new URLSearchParams(window.location.search);
-    const filtersParam = params.get('filters');
-    if (filtersParam) {
-      return new Set(filtersParam.split(',').filter(Boolean)); // filter(Boolean) to remove empty strings if any
-    }
-    return new Set();
-  };
+  const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
+  const [categoryCountsFromAllPoints, setCategoryCountsFromAllPoints] = useState<Map<string, number>>(new Map());
 
-  const [activeFilters, setActiveFilters] = useState<Set<string>>(getFiltersFromUrl);
-
-  // Update URL when activeFilters change
   useEffect(() => {
-    const params = new URLSearchParams();
-    if (activeFilters.size > 0) {
-      params.set('filters', Array.from(activeFilters).join(','));
+    const queryParams = new URLSearchParams(window.location.search);
+    const filtersFromUrl = queryParams.get('filters');
+    if (filtersFromUrl) {
+      setActiveFilters(new Set(filtersFromUrl.split(',').filter(Boolean)));
     }
-    // Use replaceState to avoid polluting history for every filter change, 
-    // or pushState if you want each distinct filter state in history.
-    // For typical filter UX, replaceState is often preferred.
-    history.replaceState(null, '', activeFilters.size > 0 ? `?${params.toString()}` : window.location.pathname);
-  }, [activeFilters]);
 
-  // Listen to popstate event (browser back/forward)
+    const counts = new Map<string, number>();
+    allRfiPoints.forEach(point => {
+      point.categoryIds.forEach(catId => {
+        counts.set(catId, (counts.get(catId) || 0) + 1);
+      });
+    });
+    setCategoryCountsFromAllPoints(counts);
+
+    if (window.location.hash) {
+      const idToScroll = window.location.hash.substring(1);
+      const element = document.getElementById(idToScroll);
+      if (element) {
+        setTimeout(() => element.scrollIntoView({ behavior: 'auto', block: 'start' }), 100);
+      }
+    }
+  }, [allRfiPoints]);
+
+  const updateUrlWithFilters = useCallback((filters: Set<string>) => {
+    const params = new URLSearchParams(window.location.search);
+    if (filters.size > 0) {
+      params.set('filters', Array.from(filters).join(','));
+    } else {
+      params.delete('filters');
+    }
+    const newUrl = `${window.location.pathname}?${params.toString()}${window.location.hash}`;
+    history.replaceState(null, '', newUrl);
+  }, []);
+
   useEffect(() => {
     const handlePopState = () => {
-      setActiveFilters(getFiltersFromUrl());
+      const queryParams = new URLSearchParams(window.location.search);
+      const filtersFromUrl = queryParams.get('filters');
+      setActiveFilters(new Set(filtersFromUrl ? filtersFromUrl.split(',').filter(Boolean) : []));
+      
+      if (window.location.hash) {
+        const idToScroll = window.location.hash.substring(1);
+        const element = document.getElementById(idToScroll);
+        if (element) {
+          setTimeout(() => element.scrollIntoView({ behavior: 'auto', block: 'start' }), 100);
+        }
+      }
     };
     window.addEventListener('popstate', handlePopState);
-    return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, []); // Empty dependency array means this runs once on mount and cleans up on unmount
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
   const filteredRfiPoints = useMemo(() => {
     if (activeFilters.size === 0) {
       return allRfiPoints;
     }
-    const activeFilterArray = Array.from(activeFilters);
     return allRfiPoints.filter(point => 
-      activeFilterArray.some(filterId => 
-        point.categoryIds?.has(filterId)
-      )
+      Array.from(activeFilters).some(filter => point.categoryIds.has(filter))
     );
   }, [allRfiPoints, activeFilters]);
 
-  // Wrapped in useCallback to stabilize the function reference if passed to memoized children
+  const pointsByQuestion = useMemo(() => {
+    const map = new Map<string, ProcessedRfiPoint[]>();
+    filteredRfiPoints.forEach(point => {
+      const existing = map.get(point.rfi_question_code) || [];
+      existing.push(point);
+      map.set(point.rfi_question_code, existing);
+    });
+    return map;
+  }, [filteredRfiPoints]);
+
   const handleFilterChange = useCallback((filterId: string, isActive: boolean) => {
     setActiveFilters(prevFilters => {
-      let newFilters = new Set(prevFilters);
+      const newFilters = new Set(prevFilters);
       let targetGroupId: string | undefined = undefined;
 
-      // Find the group of the clicked filterId
       for (const group of categoriesHierarchy.category_groups) {
         if (group.categories.some(cat => cat.id === filterId)) {
           targetGroupId = group.group_id;
@@ -71,11 +97,11 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
         }
       }
 
+      let filtersToUpdateInUrl = new Set<string>();
+
       if (targetGroupId) {
-        // If a filter is being activated, or if it's being deactivated but was part of the target group
-        // Clear filters from other groups
         const filtersToKeep = new Set<string>();
-        prevFilters.forEach(activeFilterId => {
+        newFilters.forEach(activeFilterId => {
           let activeFilterGroupId: string | undefined = undefined;
           for (const group of categoriesHierarchy.category_groups) {
             if (group.categories.some(cat => cat.id === activeFilterId)) {
@@ -87,50 +113,33 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
             filtersToKeep.add(activeFilterId);
           }
         });
-        newFilters = filtersToKeep;
+        filtersToUpdateInUrl = filtersToKeep;
       }
       
-      // Now, apply the change for the clicked filterId
       if (isActive) {
-        newFilters.add(filterId);
+        filtersToUpdateInUrl.add(filterId);
       } else {
-        newFilters.delete(filterId);
+        filtersToUpdateInUrl.delete(filterId);
       }
       
-      return newFilters;
+      updateUrlWithFilters(filtersToUpdateInUrl);
+      return filtersToUpdateInUrl;
     });
-  }, [categoriesHierarchy]); // Added categoriesHierarchy to dependencies
+  }, [categoriesHierarchy, updateUrlWithFilters]);
 
   const handleClearFilters = useCallback(() => {
     setActiveFilters(new Set());
-  }, []);
+    updateUrlWithFilters(new Set());
+  }, [updateUrlWithFilters]);
 
   const handleCategoryTagClick = useCallback((categoryId: string) => {
-    setActiveFilters(new Set([categoryId]));
+    const newFilters = new Set([categoryId]);
+    setActiveFilters(newFilters);
+    updateUrlWithFilters(newFilters);
     window.scrollTo({ top: 0, behavior: 'auto' });
-  }, []);
+  }, [updateUrlWithFilters]);
 
-  // Group filtered RFI points by their rfi_question_code
-  const pointsByQuestion = useMemo(() => {
-    const grouped: { [key: string]: RfiPoint[] } = {};
-    filteredRfiPoints.forEach(point => {
-      if (!grouped[point.rfi_question_code]) {
-        grouped[point.rfi_question_code] = [];
-      }
-      grouped[point.rfi_question_code].push(point);
-    });
-    return grouped;
-  }, [filteredRfiPoints]);
-
-  const categoryCountsFromAllPoints = useMemo(() => {
-    const counts = new Map<string, number>();
-    allRfiPoints.forEach(point => { // Iterate over allRfiPoints
-      point.categoryIds?.forEach(catId => {
-        counts.set(catId, (counts.get(catId) || 0) + 1);
-      });
-    });
-    return counts;
-  }, [allRfiPoints]); // Dependency is allRfiPoints
+  const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
 
   return (
     <div className="response-browser-page">
@@ -139,68 +148,74 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
         activeFilters={activeFilters} 
         onFilterChange={handleFilterChange} 
         onClearFilters={handleClearFilters} 
-        categoryCounts={categoryCountsFromAllPoints} // Use static counts for display and disabling logic
-        categoryCountsForSorting={categoryCountsFromAllPoints} // Use static counts for stable sorting
+        categoryCounts={categoryCountsFromAllPoints} 
+        categoryCountsForSorting={categoryCountsFromAllPoints} 
       />
       <div className="rfi-content-area">
         {rfiStructure.map((section: RfiSection) => {
+          const sectionId = `rfi-sec-${sanitizeForId(section.section_id)}`;
           const renderableSubsections = section.subsections.map(subsection => {
+            const subsectionId = `rfi-subsec-${sanitizeForId(section.section_id)}-${sanitizeForId(subsection.subsection_id)}`;
             const renderableQuestions = subsection.questions.map(question => {
-              const relevantPoints = pointsByQuestion[question.question_id] || [];
-              // Always omit question if it has no relevant points for the current view (filtered or unfiltered)
-              if (relevantPoints.length === 0) {
-                return null; 
-              }
-              const questionIdAnchor = `rfi-q-${question.question_id}`;
-              return (
-                <article key={question.question_id} className="rfi-question">
-                  <h4 id={questionIdAnchor}>
-                    {question.question_id}: {question.summary_text}
-                    <a href={`#${questionIdAnchor}`} className="deep-link-icon" aria-label="Link to this question">#</a>
-                  </h4>
-                  {/* If we reach here, relevantPoints.length > 0, so just render them */}
-                  <div className="response-list">
-                    {relevantPoints.map(point => (
-                      <ResponseCard 
-                        key={point.id} 
-                        point={point} 
-                        onCategoryClick={handleCategoryTagClick}
-                      />
-                    ))}
-                  </div>
-                </article>
-              );
-            }).filter(Boolean); // Remove nulls (omitted questions)
+              const questionId = `rfi-q-${sanitizeForId(question.question_id)}`;
+              const relevantPoints = pointsByQuestion.get(question.question_id) || [];
+              
+              if (relevantPoints.length === 0) return null;
 
-            if (renderableQuestions.length === 0) {
-              return null; // Omit subsection if no renderable questions
-            }
+              return (
+                <div key={questionId} className="rfi-question-block">
+                  <h4 id={questionId} className="rfi-question-header">
+                    {question.question_id}: {question.summary_text}
+                    <a href={`#${questionId}`} className="deep-link-icon" aria-label={`Link to question ${question.question_id}`}>#</a>
+                  </h4>
+                  <div className="response-list">
+                    {relevantPoints.map(point => {
+                      const cardId = `point-${sanitizeForId(point.point_key)}`;
+                      return (
+                        <ResponseCard 
+                          key={point.id} 
+                          point={point} 
+                          onCategoryClick={handleCategoryTagClick} 
+                          cardId={cardId} 
+                        />
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            }).filter(Boolean);
+
+            if (renderableQuestions.length === 0) return null;
 
             return (
-              <section key={subsection.subsection_id} className="rfi-subsection">
-                <h3 id={`rfi-subsec-${subsection.subsection_id}`}>
-                  {subsection.subsection_id}: {subsection.subsection_title}
-                  <a href={`#rfi-subsec-${subsection.subsection_id}`} className="deep-link-icon" aria-label="Link to this subsection">#</a>
+              <div key={subsectionId} className="rfi-subsection-block">
+                <h3 id={subsectionId} className="rfi-subsection-header">
+                  {subsection.subsection_id} {subsection.subsection_title}
+                  <a href={`#${subsectionId}`} className="deep-link-icon" aria-label={`Link to subsection ${subsection.subsection_id}`}>#</a>
                 </h3>
                 {renderableQuestions}
-              </section>
+              </div>
             );
-          }).filter(Boolean); // Remove nulls (omitted subsections)
+          }).filter(Boolean);
 
-          if (renderableSubsections.length === 0) {
-            return null; // Omit section if no renderable subsections
-          }
+          if (renderableSubsections.length === 0) return null;
 
           return (
-            <section key={section.section_id} className="rfi-section">
-              <h2 id={`rfi-sec-${section.section_id}`}>
-                {section.section_id}: {section.section_title}
-                <a href={`#rfi-sec-${section.section_id}`} className="deep-link-icon" aria-label="Link to this section">#</a>
+            <div key={sectionId} className="rfi-section-block">
+              <h2 id={sectionId} className="rfi-section-header">
+                {section.section_id}. {section.section_title}
+                <a href={`#${sectionId}`} className="deep-link-icon" aria-label={`Link to section ${section.section_id}`}>#</a>
               </h2>
               {renderableSubsections}
-            </section>
+            </div>
           );
-        })}
+        }).filter(Boolean)}
+        {filteredRfiPoints.length === 0 && activeFilters.size > 0 && (
+          <p>No RFI points match the current filter criteria.</p>
+        )}
+        {allRfiPoints.length === 0 && (
+          <p>No RFI points available.</p>
+        )}
       </div>
     </div>
   );

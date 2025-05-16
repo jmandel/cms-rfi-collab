@@ -14,6 +14,11 @@ export interface RfiPoint {
   tags?: string[];
 }
 
+// ProcessedRfiPoint ensures categoryIds is always present after initial processing
+export type ProcessedRfiPoint = Omit<RfiPoint, 'categoryIds'> & {
+  categoryIds: Set<string>;
+};
+
 export interface Category {
   id: string;
   name: string;
