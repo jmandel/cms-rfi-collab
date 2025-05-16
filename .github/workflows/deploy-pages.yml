@@ -41,10 +41,9 @@ jobs:
         run: bun run scripts/build-rfi-json.bun.ts > public/build/db.json
 
       - name: Build application
-        # This command assumes src/index.tsx is your main entry point
-        # and public/index.html is your HTML template.
-        # Bun will process src/index.tsx and use public/index.html, outputting to ./build
-        run: bun build ./src/index.tsx --outdir ./build --entrypoints ./src/index.tsx --public-dir ./public
+        # This command assumes public/index.html is your HTML template which references src/index.tsx.
+        # Bun will process public/index.html and its referenced scripts, outputting to ./build
+        run: bun build ./public/index.html --outdir ./build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
