@@ -5,9 +5,11 @@ import Toast from './Toast'; // Import Toast component
 
 interface ResponseCardProps {
   point: RfiPoint;
+  onCategoryClick?: (categoryId: string) => void; // Added prop
 }
 
-const ResponseCard: React.FC<ResponseCardProps> = ({ point }) => {
+// Wrap the component with React.memo
+const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategoryClick }) => {
   // State for Toast visibility and message
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -24,7 +26,7 @@ const ResponseCard: React.FC<ResponseCardProps> = ({ point }) => {
   
   // const MockMarkdownRenderer: React.FC<{content: string}> = ({content}) => ( ... ); // Removed
 
-  const githubBaseUrl = 'https://github.com/jmandel/rfi-cms-healthtech-responses-v5/blob/main/rfi_points_markdown'; // Updated placeholder
+  const githubBaseUrl = 'https://github.com/jmandel/cms-rfi-response-smart/blob/main/rfi_points_markdown'; // Updated repository name
   // This logic assumes your markdown files are named like 'PC-10.md' or similar, derived from rfi_question_code.
   // And that point_key refers to an anchor within them, or that the file is point_key.md
   // A more robust solution would be to have a specific `source_filename` field in your `db.json`.
@@ -60,14 +62,24 @@ const ResponseCard: React.FC<ResponseCardProps> = ({ point }) => {
 
       <div className="categories-container">
         <strong>Categories:</strong>
-        {point.categories.map(catId => (
-          <span 
-            key={catId} 
-            className="category-tag"
-          >
-            {catId.split(':').pop()?.replace(/_/g, ' ')} 
-          </span>
-        ))}
+        {point.categories
+          .map(catString => {
+            const categoryId = catString.split(':').pop() || catString;
+            const categoryName = categoryId.replace(/_/g, ' ');
+            return { catString, categoryId, categoryName }; // Create objects for sorting
+          })
+          .sort((a, b) => a.categoryName.localeCompare(b.categoryName)) // Sort alphabetically by name
+          .map(catObj => ( // Map over sorted array
+            <button 
+              type="button"
+              key={catObj.catString} 
+              className="category-tag clickable"
+              onClick={() => onCategoryClick && onCategoryClick(catObj.categoryId)}
+              title={`Filter by category: ${catObj.categoryName}`}
+            >
+              {catObj.categoryName} 
+            </button>
+          ))}
       </div>
 
       <div className="action-buttons">
@@ -90,6 +102,6 @@ const ResponseCard: React.FC<ResponseCardProps> = ({ point }) => {
       </div>
     </div>
   );
-};
+}); // Close React.memo here
 
 export default ResponseCard; 

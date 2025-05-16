@@ -4,8 +4,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin: 0;
   padding: 0;
-  background-color: #f4f7f6;
-  color: #333;
+  background-color: #ffffff; /* Changed to white */
+  color: #333333; /* Standard dark gray for text */
   line-height: 1.6;
 }
 
@@ -16,9 +16,9 @@ body {
 }
 
 .App-header {
-  background-color: #2c3e50;
+  background-color: #008282; /* Teal from SMART website */
   padding: 20px;
-  border-radius: 8px;
+  border-radius: 0; /* Remove border-radius for a flatter look if matching navbar */
   margin-bottom: 30px;
   color: white;
   text-align: center;
@@ -27,6 +27,7 @@ body {
 .App-header h1 {
   margin: 0;
   font-size: 2em;
+  font-weight: 500; /* Slightly less bold if needed */
 }
 
 footer {
@@ -34,12 +35,12 @@ footer {
   margin-top: 40px;
   padding: 20px;
   font-size: 0.9em;
-  color: #777;
-  border-top: 1px solid #eee;
+  color: #666666; /* Lighter gray for footer */
+  border-top: 1px solid #eeeeee;
 }
 
 button {
-  background-color: #3498db;
+  background-color: #f37f21; /* SMART Orange */
   color: white;
   border: none;
   padding: 10px 15px;
@@ -50,7 +51,7 @@ button {
 }
 
 button:hover {
-  background-color: #2980b9;
+  background-color: #d86e1c; /* Darker SMART Orange */
 }
 
 button:disabled {
@@ -60,8 +61,8 @@ button:disabled {
 
 /* FilterPanel specific styles */
 .filter-panel {
-  background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  background-color: #f8f9fa; /* Lighter grey for filter panel background */
+  border: 1px solid #dee2e6; /* Softer border for filter panel */
   padding: 15px;
   border-radius: 8px;
   margin-bottom: 25px;
@@ -78,7 +79,7 @@ button:disabled {
 .filter-panel h3 {
   margin-top: 0;
   margin-bottom: 0;
-  color: #34495e;
+  color: #005858; /* Darker Teal for filter panel title */
   font-size: 1.2em;
 }
 
@@ -87,7 +88,7 @@ button:disabled {
   margin-top: 5px;
   margin-bottom: 5px;
   user-select: none;
-  color: #2c3e50;
+  color: #006666; /* Teal for filter group titles */
   font-weight: 600;
   display: flex;
   justify-content: space-between;
@@ -116,13 +117,78 @@ button:disabled {
 .filter-panel input[type="checkbox"] {
   margin-right: 8px;
   cursor: pointer;
-  accent-color: #3498db;
+  accent-color: #f37f21; /* SMART Orange for checkbox */
   width: 15px; 
   height: 15px;
 }
 
 .filter-group {
   margin-bottom: 5px;
+}
+
+/* RFI Structure Specific Styles */
+.rfi-content-area {
+  /* Styles for the main content area holding RFI sections */
+}
+
+.rfi-section > h2 {
+  font-size: 1.8em;
+  color: #005858; /* Darker Teal */
+  margin-top: 40px;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #008282; /* Teal border */
+  position: relative; /* For positioning the icon */
+}
+
+.rfi-subsection > h3 {
+  font-size: 1.4em;
+  color: #006666; /* Medium Teal */
+  margin-top: 30px;
+  margin-bottom: 15px;
+  position: relative; /* For positioning the icon */
+}
+
+.rfi-question > h4 {
+  font-size: 1.1em;
+  color: #007a7a; /* Lighter Teal */
+  margin-top: 20px;
+  margin-bottom: 10px;
+  font-weight: 600;
+  position: relative; /* For positioning the icon */
+}
+
+/* Deep link icon styling */
+.deep-link-icon {
+  margin-left: 12px; 
+  color: #b0bec5; 
+  text-decoration: none;
+  font-weight: bold; 
+  font-size: 0.9em;
+  transition: color 0.2s ease;
+  opacity: 0.7; 
+}
+
+.rfi-section > h2:hover .deep-link-icon,
+.rfi-subsection > h3:hover .deep-link-icon,
+.rfi-question > h4:hover .deep-link-icon,
+.deep-link-icon:hover {
+  color: #f37f21; /* SMART Orange on hover */
+  text-decoration: none; 
+  opacity: 1.0; 
+}
+
+.rfi-section > h2:hover .deep-link-icon,
+.rfi-subsection > h3:hover .deep-link-icon,
+.rfi-question > h4:hover .deep-link-icon {
+  opacity: 1.0;
+}
+
+.no-responses-text {
+  font-style: italic;
+  color: #757575; 
+  margin-left: 20px; 
+  margin-bottom: 20px;
 }
 
 /* ResponseList specific styles */
@@ -134,7 +200,7 @@ button:disabled {
   margin-bottom: 15px;
   font-weight: bold;
   font-size: 1.1em;
-  color: #34495e;
+  color: #333333; /* Dark gray for text */
 }
 
 /* ResponseCard specific styles */
@@ -150,12 +216,12 @@ button:disabled {
 .response-card h3 {
   margin-top: 0;
   margin-bottom: 8px;
-  color: #2c3e50;
+  color: #333333; /* Dark gray for card titles */
 }
 
 .response-card .card-meta {
   font-size: 0.85em;
-  color: #555;
+  color: #555555;
   margin-bottom: 15px;
 }
 
@@ -167,18 +233,18 @@ button:disabled {
 .response-card .summary {
   font-style: italic;
   margin-bottom: 15px;
-  color: #333;
+  color: #444444; /* Slightly darker for summary */
 }
 
 .response-card .markdown-content-wrapper {
   margin-top: 15px;
   margin-bottom: 15px;
-  background: #f9fafb;
+  background: #f8f9fa; /* Light gray for markdown background */
   padding: 15px;
   border-radius: 4px;
   border: 1px solid #e8e8e8;
-  max-height: 400px; /* Control max height */
-  overflow-y: auto; /* Add scroll for overflow */
+  max-height: 400px; 
+  overflow-y: auto; 
 }
 
 .response-card .categories-container {
@@ -187,42 +253,55 @@ button:disabled {
 }
 
 .response-card .category-tag {
-  background-color: #eaf2f8; /* Lighter blue */
-  color: #2c3e50; /* Darker blue text */
+  background-color: #e0f7fa; /* Lighter teal/cyan for category tags */
+  color: #006064; /* Dark cyan text for tags */
   padding: 4px 10px;
   border-radius: 16px;
   font-size: 0.8em;
   margin: 0 5px 5px 0;
   display: inline-block;
-  border: 1px solid #d4e6f1;
+  border: 1px solid #b2ebf2; /* Cyan border for tags */
+}
+
+.response-card .category-tag.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.response-card .category-tag.clickable:hover {
+  background-color: #b2ebf2; /* Darker cyan on hover */
+  border-color: #80deea;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .response-card .action-buttons {
   margin-top: 20px;
-  border-top: 1px solid #eee;
+  border-top: 1px solid #eeeeee;
   padding-top: 15px;
   display: flex;
-  gap: 10px; /* Adds space between buttons */
+  gap: 10px; 
 }
 
+/* Match general button style for action buttons, but can be overridden */
 .response-card .action-buttons button,
 .response-card .action-buttons a {
   padding: 8px 12px;
   font-size: 0.9em;
 }
 
+/* Styling for "View on GitHub" link to look like a secondary button */
 .response-card .action-buttons a {
   text-decoration: none;
-  border: 1px solid #bdc3c7;
+  border: 1px solid #adb5bd; /* Grey border */
   border-radius: 4px;
-  color: #2c3e50;
-  background-color: #f4f6f6;
+  color: #212529; /* Dark text */
+  background-color: #f8f9fa; /* Light grey background */
   transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .response-card .action-buttons a:hover {
-  background-color: #e5e8e8;
-  border-color: #95a5a6;
+  background-color: #e9ecef; /* Darker grey on hover */
+  border-color: #868e96;
 }
 
 /* Markdown specific styling */
@@ -232,7 +311,7 @@ button:disabled {
 .markdown-content-wrapper h4, 
 .markdown-content-wrapper h5, 
 .markdown-content-wrapper h6 {
-  color: #2c3e50; /* Dark blue for headings */
+  color: #005858; /* Darker Teal for headings in markdown */
   margin-top: 1.2em;
   margin-bottom: 0.6em;
 }
@@ -253,26 +332,27 @@ button:disabled {
 }
 
 .markdown-content-wrapper blockquote {
-  border-left: 4px solid #3498db;
+  border-left: 4px solid #008282; /* Teal for blockquote border */
   margin-left: 0;
   padding-left: 15px;
-  color: #555;
+  color: #555555;
   font-style: italic;
+  background-color: #f1fcfc; /* Very light teal for blockquote background */
 }
 
 .markdown-content-wrapper pre {
-  background-color: #2d2d2d; /* Dark background for code blocks */
-  color: #f8f8f2; /* Light text for code blocks */
+  background-color: #2d2d2d; 
+  color: #f8f8f2; 
   padding: 15px;
   border-radius: 4px;
-  overflow-x: auto; /* Scroll for wide code blocks */
+  overflow-x: auto; 
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
   font-size: 0.9em;
 }
 
 .markdown-content-wrapper code {
-  background-color: #ecf0f1; /* Light grey for inline code */
-  color: #c0392b; /* Reddish text for inline code */
+  background-color: #e9ecef; /* Light grey for inline code */
+  color: #c2185b; /* A pink/magenta for inline code text */
   padding: 2px 5px;
   border-radius: 3px;
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
@@ -280,8 +360,8 @@ button:disabled {
 }
 
 .markdown-content-wrapper pre code {
-  background-color: transparent; /* Code within pre should not have its own background */
-  color: inherit; /* Inherit color from pre */
+  background-color: transparent; 
+  color: inherit; 
   padding: 0;
 }
 
@@ -296,10 +376,10 @@ button:disabled {
     flex-direction: row;
   }
   .filter-panel {
-    flex: 0 0 300px;
+    flex: 0 0 300px; /* Kept existing layout */
     margin-bottom: 0;
   }
-  .response-list {
+  .rfi-content-area { /* Changed from .response-list to .rfi-content-area */
     flex: 1;
     margin-top: 0;
   }

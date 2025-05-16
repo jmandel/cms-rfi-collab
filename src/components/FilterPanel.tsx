@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { CategoriesHierarchy, CategoryGroup, Category } from '../types';
 
 interface FilterPanelProps {
@@ -6,13 +6,17 @@ interface FilterPanelProps {
   activeFilters: Set<string>;
   onFilterChange: (filterId: string, isActive: boolean) => void;
   onClearFilters: () => void;
+  categoryCounts: Map<string, number>;
+  categoryCountsForSorting: Map<string, number>;
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ 
   categoriesHierarchy, 
   activeFilters, 
   onFilterChange, 
-  onClearFilters 
+  onClearFilters, 
+  categoryCounts,
+  categoryCountsForSorting
 }) => {
   const [expandedGroups, setExpandedGroups] = useState<Set<string>>(new Set());
 
@@ -28,7 +32,6 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     });
   };
 
-  // Initialize all groups to be expanded by default
   useEffect(() => {
     const initialExpanded = new Set<string>();
     if (categoriesHierarchy && categoriesHierarchy.category_groups) {
@@ -36,6 +39,20 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     }
     setExpandedGroups(initialExpanded);
   }, [categoriesHierarchy]);
+
+  const sortedCategoryGroups = useMemo(() => {
+    return categoriesHierarchy.category_groups.map(group => ({
+      ...group,
+      categories: [...group.categories].sort((a, b) => {
+        const countA = categoryCountsForSorting.get(a.id) || 0;
+        const countB = categoryCountsForSorting.get(b.id) || 0;
+        if (countB !== countA) {
+          return countB - countA;
+        }
+        return a.name.localeCompare(b.name);
+      })
+    }));
+  }, [categoriesHierarchy, categoryCountsForSorting]);
 
   return (
     <div className="filter-panel">
@@ -45,29 +62,35 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           Clear All Filters
         </button>
       </div>
-      {categoriesHierarchy.category_groups.map((group: CategoryGroup) => (
-        <div key={group.group_id} className="filter-group">
-          <h4 onClick={() => toggleGroup(group.group_id)}>
-            {group.group_name} {expandedGroups.has(group.group_id) ? '▼' : '▶'}
-          </h4>
-          {expandedGroups.has(group.group_id) && (
-            <ul>
-              {group.categories.map((category: Category) => (
-                <li key={category.id}>
-                  <label>
-                    <input 
-                      type="checkbox" 
-                      checked={activeFilters.has(category.id)}
-                      onChange={(e) => onFilterChange(category.id, e.target.checked)}
-                    />
-                    {category.name}
-                  </label>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      ))}
+      {sortedCategoryGroups.map((group: CategoryGroup) => {
+        return (
+          <div key={group.group_id} className="filter-group">
+            <h4 onClick={() => toggleGroup(group.group_id)}>
+              {group.group_name} {expandedGroups.has(group.group_id) ? '▼' : '▶'}
+            </h4>
+            {expandedGroups.has(group.group_id) && (
+              <ul>
+                {group.categories.map((category: Category) => {
+                  const displayCount = categoryCounts.get(category.id) || 0;
+                  return (
+                    <li key={category.id}>
+                      <label title={`${category.name} - ${displayCount} item${displayCount === 1 ? '' : 's'}`}>
+                        <input 
+                          type="checkbox" 
+                          checked={activeFilters.has(category.id)}
+                          onChange={(e) => onFilterChange(category.id, e.target.checked)}
+                          disabled={displayCount === 0 && !activeFilters.has(category.id)}
+                        />
+                        {category.name} ({displayCount})
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

@@ -1,0 +1,56 @@
+name: Build and Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main # Or your default branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read   # to checkout code
+      pages: write     # to deploy to Pages
+      id-token: write  # to verify the deployment originates from an appropriate source
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20' # Or your preferred Node.js version for Bun
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v1
+        with:
+          bun-version: latest # Or a specific Bun version
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Create public/build directory if it doesn't exist
+        run: mkdir -p public/build
+
+      - name: Build RFI JSON data
+        run: bun run scripts/build-rfi-json.bun.ts > public/build/db.json
+
+      - name: Build application
+        # This command assumes src/index.tsx is your main entry point
+        # and public/index.html is your HTML template.
+        # Bun will process src/index.tsx and use public/index.html, outputting to ./build
+        run: bun build ./src/index.tsx --outdir ./build --entrypoints ./src/index.tsx --public-dir ./public
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./build # Upload the build directory
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4 
