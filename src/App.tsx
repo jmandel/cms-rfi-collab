@@ -45,7 +45,12 @@ function App() {
       />
 
       <footer>
-        <p>Site Footer</p>
+        <p>
+          The RFI responses and ideas presented here are curated by Josh Mandel, MD, and (unless otherwise specified) primarily represent his personal perspectives. This is an open, collaborative effort. These views do not necessarily represent the official positions of Microsoft or any other organization.
+        </p>
+        <p>
+          View the source and contribute on <a href="https://github.com/jmandel/cms-rfi-collab" target="_blank" rel="noopener noreferrer">GitHub</a>.
+        </p>
       </footer>
     </div>
   );
