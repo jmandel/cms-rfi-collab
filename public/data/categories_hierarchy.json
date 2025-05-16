@@ -5,10 +5,10 @@
       "group_name": "Audience / RFI Section",
       "description": "Categorizes points by the primary RFI section they address.",
       "categories": [
-        {"id": "Patient_Caregiver", "name": "Patient & Caregiver Focus", "description": "Experiences, needs, and empowerment of patients and caregivers (RFI Section B)."},
-        {"id": "Provider", "name": "Provider Focus", "description": "Provider workflows, data needs, and interactions with health IT (RFI Section C)."},
-        {"id": "Tech_Vendor_Network", "name": "Technology, Vendor, & Network Focus", "description": "Technology developers, data providers, standards, and certification (RFI Section E)."},
-        {"id": "VBC_Organization", "name": "Value-Based Care Focus", "description": "Needs and challenges of Value-Based Care organizations (RFI Section F)."}
+        {"id": "Patient_Caregiver", "name": "Patient & Caregiver", "description": "Experiences, needs, and empowerment of patients and caregivers (RFI Section B)."},
+        {"id": "Provider", "name": "Provider", "description": "Provider workflows, data needs, and interactions with health IT (RFI Section C)."},
+        {"id": "Tech_Vendor_Network", "name": "Technology, Vendor, & Network", "description": "Technology developers, data providers, standards, and certification (RFI Section E)."},
+        {"id": "VBC_Organization", "name": "Value-Based Care", "description": "Needs and challenges of Value-Based Care organizations (RFI Section F)."}
       ]
     },
     {

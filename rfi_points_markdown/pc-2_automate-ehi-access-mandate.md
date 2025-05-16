@@ -18,4 +18,8 @@ To bridge the gap between USCDI-only API access and the need for comprehensive h
 1.  Electronically and programmatically *request* their complete EHI Export from a certified Health IT Module.
 2.  Electronically and programmatically *monitor the status* of this export generation process (e.g., pending, in-progress, completed, failed).
 3.  Securely and programmatically *receive or download* the complete EHI Export package once it is ready.
-This entire process must be digital end-to-end, eliminating reliance on out-of-band methods like phone calls, faxes, or custom portal-only workflows that are not accessible to third-party applications. The exported EHI itself must be provided in a documented, computable format to be truly useful.
+This entire process must be digital end-to-end, eliminating reliance on out-of-band methods like phone calls, faxes, or custom portal-only workflows that are not accessible to third-party applications. While the specific output package format does not need to be universally standardized across all systems, the developer documentation accompanying the export must be exceptionally clear, comprehensive, and sufficient for an experienced practitioner to successfully understand and work with the file's contents and structure.
+
+Current implementations often fall short in several critical ways:
+1.  **Scope Misinterpretation:** Many systems fail to understand the comprehensive scope of "EHI Export," mistakenly offering only summary data (e.g., a Continuity of Care Document) instead of the complete set of Electronic Health Information as required.
+2.  **Inadequate Documentation:** The developer documentation provided is frequently insufficient, leaving the meaning of data elements, their interrelationships, and the overall data structure unclear, making it difficult for third-party applications to reliably process and utilize the exported data.

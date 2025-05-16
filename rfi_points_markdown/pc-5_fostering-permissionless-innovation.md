@@ -3,7 +3,7 @@ id: "pc5-004"
 rfi_question_code: "PC-5"
 point_key: "FOSTERING_PERMISSIONLESS_INNOVATION_FOR_INDIVIDUALS"
 short_title: "Foster Permissionless Innovation for Individuals"
-summary: "To encourage patient interest, CMS must champion policies enabling patients and hobbyist developers to easily register and connect their own self-developed apps to access their own data via certified EHR APIs and network frameworks (like TEFCA IAS), free of charge. This drives a vibrant ecosystem."
+summary: "To encourage patient interest, CMS must champion policies enabling patients and hobbyist developers to easily register and connect their own self-developed apps to access their own data via certified EHR APIs and network frameworks, free of charge. This drives a vibrant ecosystem."
 categories:
   - "Audience_RFI_Section:Patient_Caregiver"
   - "Core_Theme:Permissionless_Innovation"
