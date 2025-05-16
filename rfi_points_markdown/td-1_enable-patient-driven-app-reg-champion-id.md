@@ -3,7 +3,7 @@ id: "td1-001"
 rfi_question_code: "TD-1"
 point_key: "ENABLE_PATIENT_DRIVEN_APPLICATION_REGISTRATION_AND_ACCESS_CHAMPION_ID"
 short_title: "Champion Trusted Patient Identity Credentials"
-summary: "CMS should actively promote and facilitate the availability and adoption of widely accepted, free-to-patient, high-assurance (NIST IAL2/AAL2) digital identity credentials. Options include enhancing Login.gov, recognizing interoperable state-issued mobile Driver's Licenses (mDLs), or supporting other verifiable credential solutions, forming the bedrock for secure patient-mediated access."
+summary: "CMS should actively promote and facilitate the availability and adoption of widely accepted, free-to-patient, high-assurance (NIST IAL2/AAL2) digital identity credentials (Login.gov, mDLs, VCs)."
 categories:
   - "Audience_RFI_Section:Tech_Vendor_Network"
   - "Core_Theme:Digital_Identity_Authorization"

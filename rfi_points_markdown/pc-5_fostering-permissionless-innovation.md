@@ -13,7 +13,7 @@ categories:
   - "Core_Theme:Digital_Identity_Authorization"
 ---
 A key driver for patient and caregiver interest in digital health products is the availability of a vibrant, diverse ecosystem of useful applications. While commercial entities will play a role, it is critical for CMS to champion policies that foster *permissionless innovation for individuals*. This means:
-*   Enabling patients and hobbyist developers to easily and programmatically register their *own self-developed applications* with certified EHRs and network frameworks (such as TEFCA Individual Access Services).
+*   Enabling patients and hobbyist developers to easily and programmatically register their *own self-developed applications* with certified EHRs and networks
 *   Ensuring that these individually authorized apps can connect and access the patient's *own data* without undue administrative hurdles or the need for formal business agreements.
 *   Guaranteeing that such individual access for personal use is free of charge from data holders and network operators.
 This approach encourages grassroots innovation, allows individuals to solve their unique health data challenges, and naturally leads to a richer and more engaging suite of digital health products.
