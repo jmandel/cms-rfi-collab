@@ -7,6 +7,7 @@ export interface RfiPoint {
   markdown_content: string; // Changed from 'body' to 'markdown_content'
   categories: string[]; // Array of category IDs, e.g., ["Audience_RFI_Section:Patient_Caregiver", "Core_Theme:Data_Access_Completeness"]
   categoryIds?: Set<string>; // For optimized filtering
+  source_filename?: string; // The actual filename from rfi_points_markdown/
   // Add any other fields that will be present in db.json
   source_document?: string;
   source_section?: string;

@@ -16,6 +16,7 @@ interface PointFrontmatter {
 
 interface RfiPoint extends PointFrontmatter {
     markdown_content: string;
+    source_filename: string;
 }
 
 async function buildRfiPointsJson() {
@@ -27,15 +28,17 @@ async function buildRfiPointsJson() {
         try {
             const fileContent = await fs.readFile(filePath, 'utf-8');
             const { data, content: markdown_content } = matter(fileContent) as { data: PointFrontmatter, content: string };
+            const source_filename = path.basename(filePath);
 
             if (!data.id || !data.rfi_question_code || !data.point_key || !data.short_title || !data.summary || !data.categories || !Array.isArray(data.categories)) {
-                console.warn(`Skipping file with missing/invalid required frontmatter: ${path.basename(filePath)}`);
+                console.warn(`Skipping file with missing/invalid required frontmatter: ${source_filename}`);
                 continue;
             }
 
             allPoints.push({
                 ...data,
                 markdown_content: markdown_content.trim(),
+                source_filename: source_filename,
             });
         } catch (error) {
             console.error(`Error processing file ${path.basename(filePath)}:`, error);

@@ -33,7 +33,9 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
   // For now, trying to link to a potential file named like point_key.md or rfi_question_code + .md
   // This is highly speculative and needs to match your actual file structure in rfi_points_markdown/
   let constructedFileName = '';
-  if (point.rfi_question_code && point.point_key) {
+  if (point.source_filename) {
+    constructedFileName = point.source_filename;
+  } else if (point.rfi_question_code && point.point_key) { // Fallback to old heuristic
     const questionCodeSlug = point.rfi_question_code.toLowerCase();
     const pointKeySlug = point.point_key.toLowerCase().replace(/_/g, '-');
     constructedFileName = `${questionCodeSlug}_${pointKeySlug}.md`;
