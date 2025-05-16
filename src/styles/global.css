@@ -128,7 +128,14 @@ button:disabled {
 
 /* RFI Structure Specific Styles */
 .rfi-content-area {
-  /* Styles for the main content area holding RFI sections */
+  overflow-x: auto; /* Allow scroll if content overflows */
+  overflow-wrap: break-word; /* Help prevent overflow */
+}
+
+.rfi-section > h2,
+.rfi-subsection > h3,
+.rfi-question > h4 {
+  overflow-wrap: break-word; /* Prevent long titles from breaking layout */
 }
 
 .rfi-section > h2 {
@@ -230,9 +237,20 @@ button:disabled {
  margin: 0 5px;
 }
 
-.response-card .summary {
-  font-style: italic;
+.response-card .summary-section {
   margin-bottom: 15px;
+}
+
+.response-card .summary-section strong {
+  margin-bottom: 0;
+  color: #333333;
+  margin-right: 0.5em;
+}
+
+.response-card .summary-text {
+  font-style: italic;
+  margin-top: 0;
+  margin-left: 0;
   color: #444444; /* Slightly darker for summary */
 }
 
@@ -243,8 +261,8 @@ button:disabled {
   padding: 15px;
   border-radius: 4px;
   border: 1px solid #e8e8e8;
-  max-height: 400px; 
-  overflow-y: auto; 
+  overflow-x: auto; /* Allow scroll if code/text overflows */
+  overflow-wrap: break-word;
 }
 
 .response-card .categories-container {
@@ -316,7 +334,13 @@ button:disabled {
   margin-bottom: 0.6em;
 }
 
-.markdown-content-wrapper p {
+.markdown-content-wrapper p,
+.markdown-content-wrapper li,
+.markdown-content-wrapper blockquote,
+.markdown-content-wrapper pre,
+.markdown-content-wrapper code {
+  overflow-wrap: break-word; /* Ensure text wraps */
+  word-wrap: break-word; /* Legacy support */
   margin-bottom: 0.8em;
   line-height: 1.7;
 }

@@ -33,7 +33,7 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>CMS RFI: SMART Response Browser</h1>
+        <h1>CMS RFI: Draft Response Browser</h1>
         {/* Links to RFI info, GitHub repo can be added here */}
       </header>
 

@@ -53,7 +53,11 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
         <span>Question: {point.rfi_question_code}</span> | 
         <span>Key: {point.point_key}</span>
       </div>
-      <p className="summary">{point.summary}</p>
+      <div className="summary-section">
+        <p className="summary-text">
+          <strong>Summary:</strong> {point.summary}
+        </p>
+      </div>
       
       <div className="markdown-content-wrapper">
         <MarkdownRenderer content={point.markdown_content} /> {/* Used actual component */}
