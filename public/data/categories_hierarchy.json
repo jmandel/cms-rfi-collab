@@ -1,0 +1,66 @@
+{
+  "category_groups": [
+    {
+      "group_id": "Audience_RFI_Section",
+      "group_name": "Audience / RFI Section",
+      "description": "Categorizes points by the primary RFI section they address.",
+      "categories": [
+        {"id": "Patient_Caregiver", "name": "Patient & Caregiver Focus", "description": "Experiences, needs, and empowerment of patients and caregivers (RFI Section B)."},
+        {"id": "Provider", "name": "Provider Focus", "description": "Provider workflows, data needs, and interactions with health IT (RFI Section C)."},
+        {"id": "Payer", "name": "Payer Focus", "description": "Payer perspectives and roles (RFI Section D - placeholder)."},
+        {"id": "Tech_Vendor_Network", "name": "Technology, Vendor, & Network Focus", "description": "Technology developers, data providers, standards, and certification (RFI Section E)."},
+        {"id": "VBC_Organization", "name": "Value-Based Care Focus", "description": "Needs and challenges of Value-Based Care organizations (RFI Section F)."}
+      ]
+    },
+    {
+      "group_id": "Core_Theme",
+      "group_name": "Core Theme",
+      "description": "High-level thematic concepts addressed by the response points.",
+      "categories": [
+        {"id": "Data_Access_Completeness", "name": "Data Access & Completeness", "description": "Ensuring access to all relevant health data."},
+        {"id": "API_Performance_Reliability", "name": "API Performance & Reliability", "description": "Mandating high-performing, reliable APIs."},
+        {"id": "Patient_Empowerment_Control", "name": "Patient Empowerment & Control", "description": "Giving patients meaningful control over their data."},
+        {"id": "Standards_Interoperability", "name": "Standards & Interoperability", "description": "Leveraging and evolving open standards."},
+        {"id": "Permissionless_Innovation", "name": "Permissionless Innovation", "description": "Enabling diverse developers to build on health IT."},
+        {"id": "Digital_Identity_Authorization", "name": "Digital Identity & Authorization", "description": "Secure and interoperable identity/authorization."},
+        {"id": "EHI_Export_Modernization", "name": "EHI Export Modernization", "description": "Automating and standardizing EHI Export."},
+        {"id": "TEFCA_Evolution", "name": "TEFCA Evolution", "description": "Guiding TEFCA to be patient-centric and effective."},
+        {"id": "Information_Blocking", "name": "Information Blocking", "description": "Addressing practices that hinder data flow."},
+        {"id": "Certification_Enforcement", "name": "Certification & Enforcement", "description": "Strengthening ONC certification for real-world use."},
+        {"id": "VBC_Enablement", "name": "Value-Based Care Enablement", "description": "Using technology to support VBC goals."},
+        {"id": "Data_Quality_Integrity", "name": "Data Quality & Integrity", "description": "Ensuring accuracy and reliability of data."},
+        {"id": "Transparency_Accountability", "name": "Transparency & Accountability", "description": "Ensuring systems and processes are transparent and actors are accountable."}
+      ]
+    },
+    {
+      "group_id": "Key_Technology_Mechanism",
+      "group_name": "Key Technology / Mechanism",
+      "description": "Specific technologies, standards, or mechanisms discussed.",
+      "categories": [
+        {"id": "FHIR_API", "name": "FHIR API", "description": "General FHIR-based Application Programming Interfaces."},
+        {"id": "USCDI", "name": "USCDI", "description": "United States Core Data for Interoperability."},
+        {"id": "EHI_Export", "name": "EHI Export", "description": "Electronic Health Information Export capability."},
+        {"id": "Bulk_Data_FHIR", "name": "Bulk Data FHIR", "description": "FHIR Bulk Data Access API."},
+        {"id": "TEFCA_IAS", "name": "TEFCA & IAS", "description": "TEFCA and its Individual Access Services."},
+        {"id": "Digital_Identity", "name": "Digital Identity", "description": "Mechanisms like mDLs, Login.gov, IAL2/AAL2."},
+        {"id": "Authorization_Consent", "name": "Authorization & Consent", "description": "Mechanisms for managing data sharing permissions."},
+        {"id": "CDS_Hooks", "name": "CDS Hooks", "description": "Clinical Decision Support Hooks."},
+        {"id": "SMART_on_FHIR", "name": "SMART on FHIR", "description": "SMART on FHIR application launch framework."},
+        {"id": "Record_Locator_Service_RLS", "name": "Record Locator Service (RLS)", "description": "Technology for finding where patient data resides."},
+        {"id": "Provider_Directory", "name": "Provider Directory", "description": "Nationwide directory of provider FHIR endpoints."}
+      ]
+    },
+    {
+      "group_id": "Policy_Regulation",
+      "group_name": "Policy & Regulation",
+      "description": "Aspects related to policy, regulation, and governance.",
+      "categories": [
+        {"id": "ONC_Certification", "name": "ONC Certification", "description": "ONC Health IT Certification Program."},
+        {"id": "Information_Blocking_Policy", "name": "Information Blocking Policy", "description": "Policies related to preventing information blocking."},
+        {"id": "CMS_Policy_Role", "name": "CMS Policy & Role", "description": "The role and policies of CMS in the health IT ecosystem."},
+        {"id": "Data_Privacy_Security", "name": "Data Privacy & Security", "description": "Aspects related to protecting patient data."},
+        {"id": "Cost_Accessibility_Equity", "name": "Cost, Accessibility & Equity", "description": "Ensuring solutions are affordable, accessible, and equitable."}
+      ]
+    }
+  ]
+}
