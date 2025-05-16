@@ -26,7 +26,7 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
   
   // const MockMarkdownRenderer: React.FC<{content: string}> = ({content}) => ( ... ); // Removed
 
-  const githubBaseUrl = 'https://github.com/jmandel/cms-rfi-response-smart/blob/main/rfi_points_markdown'; // Updated repository name
+  const githubBaseUrl = 'https://github.com/jmandel/cms-rfi-collab/blob/main/rfi_points_markdown'; // Updated repository name
   // This logic assumes your markdown files are named like 'PC-10.md' or similar, derived from rfi_question_code.
   // And that point_key refers to an anchor within them, or that the file is point_key.md
   // A more robust solution would be to have a specific `source_filename` field in your `db.json`.
