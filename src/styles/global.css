@@ -1,0 +1,306 @@
+/* src/styles/global.css */
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f7f6;
+  color: #333;
+  line-height: 1.6;
+}
+
+.App {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.App-header {
+  background-color: #2c3e50;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+  color: white;
+  text-align: center;
+}
+
+.App-header h1 {
+  margin: 0;
+  font-size: 2em;
+}
+
+footer {
+  text-align: center;
+  margin-top: 40px;
+  padding: 20px;
+  font-size: 0.9em;
+  color: #777;
+  border-top: 1px solid #eee;
+}
+
+button {
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.95em;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+button:disabled {
+  background-color: #bdc3c7;
+  cursor: not-allowed;
+}
+
+/* FilterPanel specific styles */
+.filter-panel {
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 15px;
+  border-radius: 8px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.filter-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.filter-panel h3 {
+  margin-top: 0;
+  margin-bottom: 0;
+  color: #34495e;
+  font-size: 1.2em;
+}
+
+.filter-panel h4 {
+  cursor: pointer;
+  margin-top: 5px;
+  margin-bottom: 5px;
+  user-select: none;
+  color: #2c3e50;
+  font-weight: 600;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px 0;
+}
+
+.filter-panel ul {
+  list-style: none;
+  padding-left: 15px;
+  margin-top: 0px;
+}
+
+.filter-panel li {
+  margin-bottom: 0px;
+}
+
+.filter-panel li label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  padding: 3px 0;
+  font-size: 0.9em;
+}
+
+.filter-panel input[type="checkbox"] {
+  margin-right: 8px;
+  cursor: pointer;
+  accent-color: #3498db;
+  width: 15px; 
+  height: 15px;
+}
+
+.filter-group {
+  margin-bottom: 5px;
+}
+
+/* ResponseList specific styles */
+.response-list {
+  margin-top: 20px;
+}
+
+.response-list > p {
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 1.1em;
+  color: #34495e;
+}
+
+/* ResponseCard specific styles */
+.response-card {
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+}
+
+.response-card h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #2c3e50;
+}
+
+.response-card .card-meta {
+  font-size: 0.85em;
+  color: #555;
+  margin-bottom: 15px;
+}
+
+.response-card .card-meta span + span::before {
+ content: ' | ';
+ margin: 0 5px;
+}
+
+.response-card .summary {
+  font-style: italic;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.response-card .markdown-content-wrapper {
+  margin-top: 15px;
+  margin-bottom: 15px;
+  background: #f9fafb;
+  padding: 15px;
+  border-radius: 4px;
+  border: 1px solid #e8e8e8;
+  max-height: 400px; /* Control max height */
+  overflow-y: auto; /* Add scroll for overflow */
+}
+
+.response-card .categories-container {
+  margin-top: 15px;
+  margin-bottom: 10px;
+}
+
+.response-card .category-tag {
+  background-color: #eaf2f8; /* Lighter blue */
+  color: #2c3e50; /* Darker blue text */
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 0.8em;
+  margin: 0 5px 5px 0;
+  display: inline-block;
+  border: 1px solid #d4e6f1;
+}
+
+.response-card .action-buttons {
+  margin-top: 20px;
+  border-top: 1px solid #eee;
+  padding-top: 15px;
+  display: flex;
+  gap: 10px; /* Adds space between buttons */
+}
+
+.response-card .action-buttons button,
+.response-card .action-buttons a {
+  padding: 8px 12px;
+  font-size: 0.9em;
+}
+
+.response-card .action-buttons a {
+  text-decoration: none;
+  border: 1px solid #bdc3c7;
+  border-radius: 4px;
+  color: #2c3e50;
+  background-color: #f4f6f6;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.response-card .action-buttons a:hover {
+  background-color: #e5e8e8;
+  border-color: #95a5a6;
+}
+
+/* Markdown specific styling */
+.markdown-content-wrapper h1, 
+.markdown-content-wrapper h2, 
+.markdown-content-wrapper h3, 
+.markdown-content-wrapper h4, 
+.markdown-content-wrapper h5, 
+.markdown-content-wrapper h6 {
+  color: #2c3e50; /* Dark blue for headings */
+  margin-top: 1.2em;
+  margin-bottom: 0.6em;
+}
+
+.markdown-content-wrapper p {
+  margin-bottom: 0.8em;
+  line-height: 1.7;
+}
+
+.markdown-content-wrapper ul, 
+.markdown-content-wrapper ol {
+  margin-left: 20px;
+  margin-bottom: 0.8em;
+}
+
+.markdown-content-wrapper li {
+  margin-bottom: 0.4em;
+}
+
+.markdown-content-wrapper blockquote {
+  border-left: 4px solid #3498db;
+  margin-left: 0;
+  padding-left: 15px;
+  color: #555;
+  font-style: italic;
+}
+
+.markdown-content-wrapper pre {
+  background-color: #2d2d2d; /* Dark background for code blocks */
+  color: #f8f8f2; /* Light text for code blocks */
+  padding: 15px;
+  border-radius: 4px;
+  overflow-x: auto; /* Scroll for wide code blocks */
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content-wrapper code {
+  background-color: #ecf0f1; /* Light grey for inline code */
+  color: #c0392b; /* Reddish text for inline code */
+  padding: 2px 5px;
+  border-radius: 3px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content-wrapper pre code {
+  background-color: transparent; /* Code within pre should not have its own background */
+  color: inherit; /* Inherit color from pre */
+  padding: 0;
+}
+
+.response-browser-page {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+@media (min-width: 768px) {
+  .response-browser-page {
+    flex-direction: row;
+  }
+  .filter-panel {
+    flex: 0 0 300px;
+    margin-bottom: 0;
+  }
+  .response-list {
+    flex: 1;
+    margin-top: 0;
+  }
+} 
