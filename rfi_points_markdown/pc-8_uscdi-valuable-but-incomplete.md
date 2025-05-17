@@ -13,10 +13,7 @@ categories:
 Data corresponding to the United States Core Data for Interoperability (USCDI), accessed via FHIR APIs, is valuable and increasingly available. It provides a standardized set of core, structured data elements that are foundational for many digital health applications.
 
 However, USCDI represents only a fraction of a patient's complete electronic health information (EHI). Data that is valuable but very hard for patients and app developers to access programmatically today includes:
-*   **Detailed Provider Notes:** Progress notes, consult notes, discharge summaries, operative reports, which contain crucial narrative and clinical reasoning.
 *   **Non-Standardized but Clinically Relevant Data:** Custom flowsheets, specific device data, or other structured/semi-structured data not yet part of USCDI.
 *   **Complete Historical Records:** Data created before widespread USCDI adoption or from systems not fully mapped to USCDI.
-*   **Full Imaging Narratives and Reports:** While USCDI may include an observation that an image was taken, the detailed radiologist report is often separate and inaccessible via current USCDI APIs.
-*   **Appointment Schedules (programmatic access):** While some portals show this, API access for apps is inconsistent.
-*   **Operative Reports:** As a specific type of detailed note.
-These data types are often critical for comprehensive understanding, advanced analytics, and AI-driven insights.
+*   **Full Imaging Data:** While USCDI includes narrative imaging reports, it does not provide access to actual imaging study data.
+*   **Appointment Schedules:** While some portals show this, the data are not typically accessible through a standardized API.
