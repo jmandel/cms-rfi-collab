@@ -15,6 +15,7 @@ categories:
 Regarding USCDI and data element access (TD-7):
 
 1.  **USCDI is a Core Foundation, Not a Ceiling:** USCDI provides an essential standardized core dataset, advancing baseline interoperability.
-2.  **USCDI Must Not Limit API Scope or EHI Completeness:** Certified APIs must expose data beyond USCDI if present and permissible. USCDI is a floor, not a restrictive ceiling, for the Cures Act's mandate for access to ALL EHI.
-3.  **EHI Export Remains Essential for Comprehensiveness:** The (see **Cross-Cutting Principle: [Automated, Standardized Retrieval of Complete EHI](#EHI_EXPORT_API)**) is critical for accessing the vast EHI not covered by USCDI or common FHIR profiles (e.g., unstructured notes, legacy data).
+2.  TODO: Expand with imaging study metadata + image data 
+3.  **USCDI Must Not Limit API Scope or EHI Completeness:** Certified APIs must expose data beyond USCDI if present and permissible. USCDI is a floor, not a restrictive ceiling, for the Cures Act's mandate for access to ALL EHI.
+4.  **EHI Export Remains Essential for Comprehensiveness:** The (see **Cross-Cutting Principle: [Automated, Standardized Retrieval of Complete EHI](#EHI_EXPORT_API)**) is critical for accessing the vast EHI not covered by USCDI or common FHIR profiles (e.g., unstructured notes, legacy data).
 This multi-tiered strategy is encapsulated in the (see **Cross-Cutting Principle: [Data Completeness: USCDI Minimum, FHIR API for Richer Exchange, EHI Export for Comprehensiveness](#DATA_COMPLETENESS)**) principle.
