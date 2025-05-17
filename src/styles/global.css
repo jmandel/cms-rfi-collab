@@ -1,97 +1,137 @@
 /* src/styles/global.css */
 
+/* Reset and Basic Styles */
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   margin: 0;
-  padding: 0;
-  background-color: #ffffff; /* Changed to white */
-  color: #333333; /* Standard dark gray for text */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: #f4f7f6;
+  color: #333;
   line-height: 1.6;
 }
 
-.App {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.App-header {
-  background-color: #008282; /* Teal from SMART website */
-  padding: 20px;
-  border-radius: 0; /* Remove border-radius for a flatter look if matching navbar */
-  margin-bottom: 30px;
-  color: white;
-  text-align: center;
-  display: flex; /* Use flexbox for alignment */
-  justify-content: center; /* Center title */
-  align-items: center; /* Vertically align items */
-  position: relative; /* For absolute positioning of the about link */
-}
-
-.App-header h1 {
-  margin: 0;
-  font-size: 2em;
-  font-weight: 500;
-}
-
-.about-link {
-  color: white;
+a {
+  color: #007bff;
   text-decoration: none;
-  font-size: 0.9em; /* Adjusted for text to be less dominant than title */
-  font-weight: 500;
-  position: absolute;
-  right: 25px; /* Slightly more spacing from edge */
-  top: 50%;
-  transform: translateY(-50%);
-  padding: 6px 10px; /* Give it a bit more of a button feel */
-  border: 1px solid transparent; /* For hover effect */
-  border-radius: 4px;
-  transition: background-color 0.2s ease, opacity 0.2s ease, border-color 0.2s ease;
 }
 
-.about-link:hover {
-  opacity: 1;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.3);
-}
-
-footer {
-  text-align: center;
-  margin-top: 40px;
-  padding: 20px;
-  font-size: 0.9em;
-  color: #666666; /* Lighter gray for footer */
-  border-top: 1px solid #eeeeee;
+a:hover {
+  text-decoration: underline;
 }
 
 button {
-  background-color: #f37f21; /* SMART Orange */
-  color: white;
-  border: none;
-  padding: 10px 15px;
-  border-radius: 4px;
   cursor: pointer;
-  font-size: 0.95em;
-  transition: background-color 0.2s ease;
+  font-family: inherit;
+  padding: 8px 15px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  transition: background-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
 }
 
 button:hover {
-  background-color: #d86e1c; /* Darker SMART Orange */
+  background-color: #f0f0f0;
+  border-color: #bbb;
 }
 
 button:disabled {
-  background-color: #bdc3c7;
   cursor: not-allowed;
+  opacity: 0.6;
 }
 
-/* FilterPanel specific styles */
+/* App Layout */
+.App {
+  text-align: center;
+}
+
+.App-header {
+  background-color: #282c34;
+  padding: 20px;
+  color: white;
+  margin-bottom: 20px;
+}
+
+.App-header h1 {
+  margin: 0 0 10px 0;
+  font-size: 1.8em;
+}
+
+.main-nav {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 10px;
+}
+
+.main-nav button, .main-nav a {
+  background-color: #61dafb;
+  border: none;
+  color: #282c34;
+  padding: 10px 20px;
+  font-weight: bold;
+  text-transform: uppercase;
+  font-size: 0.9em;
+}
+
+.main-nav button.active {
+  background-color: #ffffff;
+  color: #282c34;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.main-nav button:hover, .main-nav a:hover {
+  background-color: #52b8d8;
+}
+
+.about-link {
+  background-color: #4a505a !important;
+  color: white !important;
+}
+.about-link:hover {
+   background-color: #5f6672 !important;
+}
+
+
+footer {
+  background-color: #333;
+  color: #eee;
+  padding: 20px;
+  font-size: 0.9em;
+  margin-top: 40px;
+}
+
+footer p {
+  max-width: 800px;
+  margin: 10px auto;
+}
+
+footer a {
+  color: #61dafb;
+}
+
+/* Page Specific Layouts */
+.response-browser-page {
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  padding: 0 20px;
+  align-items: flex-start;
+}
+
 .filter-panel {
-  background-color: #f8f9fa; /* Lighter grey for filter panel background */
-  border: 1px solid #dee2e6; /* Softer border for filter panel */
+  flex: 0 0 300px; /* Fixed width for filter panel */
+  background-color: #fff;
   padding: 15px;
   border-radius: 8px;
-  margin-bottom: 25px;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+  align-self: flex-start; /* Stick to top */
+  position: sticky;
+  top: 20px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
 }
 
 .filter-panel-header {
@@ -99,366 +139,461 @@ button:disabled {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
-.filter-panel h3 {
-  margin-top: 0;
-  margin-bottom: 0;
-  color: #005858; /* Darker Teal for filter panel title */
+.filter-panel-header h3 {
+  margin: 0;
   font-size: 1.2em;
 }
 
-.filter-panel h4 {
+.filter-section h4, .filter-group h5 {
   cursor: pointer;
-  margin-top: 5px;
-  margin-bottom: 5px;
-  user-select: none;
-  color: #006666; /* Teal for filter group titles */
-  font-weight: 600;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px 0;
+  margin: 10px 0 5px 0;
+  font-size: 1.1em;
+  color: #0056b3; /* Darker blue for headers */
+}
+.filter-section h4:hover, .filter-group h5:hover {
+  color: #003d80;
 }
 
-.filter-panel ul {
+.filter-group ul {
   list-style: none;
-  padding-left: 15px;
-  margin-top: 0px;
+  padding-left: 10px;
+  margin-top: 5px;
 }
 
-.filter-panel li {
-  margin-bottom: 0px;
-}
-
-.filter-panel li label {
-  display: flex;
-  align-items: center;
+.filter-group li label {
+  display: flex; /* Changed to flex for better alignment */
+  align-items: center; /* Vertically align items in label */
+  padding: 4px 0;
+  font-size: 0.95em;
   cursor: pointer;
-  padding: 3px 0;
+  justify-content: flex-start; /* Align items to the start */
+  text-align: left;
+}
+.filter-group li label input[type="checkbox"] {
+  margin-right: 8px; /* Spacing between checkbox and text */
+  flex-shrink: 0; /* Prevent checkbox from shrinking */
+}
+
+/* Unified styles for filter item text (categories and principles) */
+.filter-item-title {
+  flex-grow: 1;
+  flex-shrink: 1;
+  margin-right: 5px; /* Space before count */
+  /* Allow title to wrap */
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-wrap: break-word; 
+}
+
+.filter-item-count {
   font-size: 0.9em;
+  color: #555; /* Slightly lighter color for details */
+  white-space: nowrap; /* Prevent count from wrapping */
+  flex-shrink: 0; /* Prevent count from shrinking */
 }
 
-.filter-panel input[type="checkbox"] {
-  margin-right: 8px;
-  cursor: pointer;
-  accent-color: #f37f21; /* SMART Orange for checkbox */
-  width: 15px; 
-  height: 15px;
-}
-
-.filter-group {
-  margin-bottom: 5px;
-}
-
-/* RFI Structure Specific Styles */
 .rfi-content-area {
-  overflow-x: auto; /* Allow scroll if content overflows */
-  overflow-wrap: break-word; /* Help prevent overflow */
+  flex-grow: 1;
+  text-align: left;
 }
 
-.rfi-section > h2,
-.rfi-subsection > h3,
-.rfi-question > h4 {
-  overflow-wrap: break-word; /* Prevent long titles from breaking layout */
-}
-
-.rfi-section > h2 {
-  font-size: 1.8em;
-  color: #005858; /* Darker Teal */
-  margin-top: 40px;
-  margin-bottom: 20px;
-  padding-bottom: 10px;
-  border-bottom: 2px solid #008282; /* Teal border */
-  position: relative; /* For positioning the icon */
-}
-
-.rfi-subsection > h3 {
-  font-size: 1.4em;
-  color: #006666; /* Medium Teal */
-  margin-top: 30px;
-  margin-bottom: 15px;
-  position: relative; /* For positioning the icon */
-}
-
-.rfi-question > h4 {
-  font-size: 1.1em;
-  color: #007a7a; /* Lighter Teal */
-  margin-top: 20px;
-  margin-bottom: 10px;
-  font-weight: 600;
-  position: relative; /* For positioning the icon */
-}
-
-/* Deep link icon styling */
-.deep-link-icon {
-  margin-left: 5px;
-  text-decoration: none;
-  color: #ccc; /* Lighter color, always visible */
-  opacity: 0.7;
-  font-weight: normal;
-  transition: color 0.2s ease, opacity 0.2s ease;
-}
-
-.deep-link-icon:hover {
-  color: #007bff; /* Blue on hover */
-  opacity: 1;
-  text-decoration: none;
-}
-
-.card-deep-link {
-  font-size: 0.8em; /* Make it a bit smaller if next to h3 */
-  vertical-align: middle; /* Align better with title text */
-}
-
-.no-responses-text {
-  font-style: italic;
-  color: #757575; 
-  margin-left: 20px; 
-  margin-bottom: 20px;
-}
-
-/* ResponseList specific styles */
-.response-list {
-  margin-top: 20px;
-}
-
-.response-list > p {
-  margin-bottom: 15px;
-  font-weight: bold;
-  font-size: 1.1em;
-  color: #333333; /* Dark gray for text */
-}
-
-/* ResponseCard specific styles */
+/* Response Card Styling */
 .response-card {
-  background: #ffffff;
-  border: 1px solid #e0e0e0;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   padding: 20px;
   margin-bottom: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  text-align: left;
 }
 
 .response-card h3 {
   margin-top: 0;
-  margin-bottom: 8px;
-  color: #333333; /* Dark gray for card titles */
+  font-size: 1.4em;
+  color: #333;
 }
 
-.response-card .card-meta {
-  font-size: 0.85em;
-  color: #555555;
+.card-meta {
+  font-size: 0.9em;
+  color: #666;
+  margin-bottom: 15px;
+  border-bottom: 1px dashed #eee;
+  padding-bottom: 10px;
+}
+
+.summary-section {
   margin-bottom: 15px;
 }
 
-.response-card .card-meta span + span::before {
- content: ' | ';
- margin: 0 5px;
-}
-
-.response-card .summary-section {
-  margin-bottom: 15px;
-}
-
-.response-card .summary-section strong {
-  margin-bottom: 0;
-  color: #333333;
-  margin-right: 0.5em;
-}
-
-.response-card .summary-text {
-  font-style: italic;
-  margin-top: 0;
-  margin-left: 0;
-  color: #444444; /* Slightly darker for summary */
-}
-
-.response-card .markdown-content-wrapper {
-  margin-top: 15px;
-  margin-bottom: 15px;
-  background: #f8f9fa; /* Light gray for markdown background */
-  padding: 15px;
+.summary-text-wrapper {
+  background-color: #f8f9fa; /* Light grey background */
+  border: 1px solid #e9ecef; /* Subtle border */
+  padding: 10px 15px;
   border-radius: 4px;
-  border: 1px solid #e8e8e8;
-  overflow-x: auto; /* Allow scroll if code/text overflows */
-  overflow-wrap: break-word;
+  margin-bottom: 15px; /* Keep overall margin consistent if needed */
 }
 
-.response-card .categories-container {
+.summary-text-wrapper .summary-text {
+  font-style: italic;
+  margin: 0; /* Remove default paragraph margin if padding is on wrapper */
+}
+
+.summary-text strong {
+  color: #444;
+}
+
+.markdown-content-wrapper {
+  margin-bottom: 15px;
+  font-size: 1em;
+  line-height: 1.7;
+}
+.markdown-content-wrapper h1,
+.markdown-content-wrapper h2,
+.markdown-content-wrapper h3,
+.markdown-content-wrapper h4,
+.markdown-content-wrapper h5,
+.markdown-content-wrapper h6 {
+  margin-top: 1.5em;
+  margin-bottom: 0.5em;
+  color: #333;
+}
+.markdown-content-wrapper p {
+  margin-bottom: 1em;
+}
+.markdown-content-wrapper ul, .markdown-content-wrapper ol {
+  margin-bottom: 1em;
+  padding-left: 2em;
+}
+.markdown-content-wrapper blockquote {
+  border-left: 4px solid #eee;
+  padding-left: 1em;
+  margin-left: 0;
+  font-style: italic;
+  color: #555;
+}
+.markdown-content-wrapper pre {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 1em;
+  overflow-x: auto;
+}
+.markdown-content-wrapper code {
+  background-color: #f0f0f0;
+  padding: 0.2em 0.4em;
+  border-radius: 3px;
+  font-family: 'Courier New', Courier, monospace;
+}
+.markdown-content-wrapper pre code {
+  background-color: transparent;
+  padding: 0;
+  border-radius: 0;
+}
+
+
+.categories-container, .referenced-principles-container {
   margin-top: 15px;
-  margin-bottom: 10px;
+  padding-top: 15px;
+  border-top: 1px dashed #eee;
 }
 
-.response-card .category-tag {
-  background-color: #e0f7fa; /* Lighter teal/cyan for category tags */
-  color: #006064; /* Dark cyan text for tags */
-  padding: 4px 10px;
-  border-radius: 16px;
-  font-size: 0.8em;
-  margin: 0 5px 5px 0;
+.categories-container strong, .referenced-principles-container strong {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: bold;
+}
+
+.category-tag, .principle-tag {
   display: inline-block;
-  border: 1px solid #b2ebf2; /* Cyan border for tags */
+  padding: 6px 12px;
+  margin: 4px;
+  border-radius: 15px; /* More pill-like */
+  font-size: 0.85em;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
 }
 
-.response-card .category-tag.clickable {
-  cursor: pointer;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
+.category-tag.clickable {
+  background-color: #e7f3ff; /* Light blue */
+  color: #0056b3;
+  border-color: #b3d7ff;
 }
-
-.response-card .category-tag.clickable:hover {
-  background-color: #b2ebf2; /* Darker cyan on hover */
-  border-color: #80deea;
+.category-tag.clickable:hover {
+  background-color: #cce4ff;
+  border-color: #80bfff;
   box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-.response-card .action-buttons {
-  margin-top: 20px;
-  border-top: 1px solid #eeeeee;
-  padding-top: 15px;
-  display: flex;
-  gap: 10px; 
+/* Cross-Cutting Principle Tags & Links Styling */
+.principle-tag.clickable {
+  background-color: #e6fff0; /* Light green */
+  color: #006421;
+  border-color: #a6e0b8;
+}
+.principle-tag.clickable:hover {
+  background-color: #cff2db;
+  border-color: #80c798;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
-/* Match general button style for action buttons, but can be overridden */
-.response-card .action-buttons button,
-.response-card .action-buttons a {
-  padding: 8px 12px;
-  font-size: 0.9em;
-}
-
-/* Styling for "View on GitHub" link to look like a secondary button */
-.response-card .action-buttons a {
-  text-decoration: none;
-  border: 1px solid #adb5bd; /* Grey border */
-  border-radius: 4px;
-  color: #212529; /* Dark text */
-  background-color: #f8f9fa; /* Light grey background */
-  transition: background-color 0.2s ease, border-color 0.2s ease;
-}
-
-.response-card .action-buttons a:hover {
-  background-color: #e9ecef; /* Darker grey on hover */
-  border-color: #868e96;
-}
-
-/* Markdown specific styling */
-.markdown-content-wrapper h1, 
-.markdown-content-wrapper h2, 
-.markdown-content-wrapper h3, 
-.markdown-content-wrapper h4, 
-.markdown-content-wrapper h5, 
-.markdown-content-wrapper h6 {
-  color: #005858; /* Darker Teal for headings in markdown */
-  margin-top: 1.2em;
-  margin-bottom: 0.6em;
-}
-
-.markdown-content-wrapper p,
-.markdown-content-wrapper li,
-.markdown-content-wrapper blockquote,
-.markdown-content-wrapper pre,
-.markdown-content-wrapper code {
-  overflow-wrap: break-word; /* Ensure text wraps */
-  word-wrap: break-word; /* Legacy support */
-  margin-bottom: 0.8em;
-  line-height: 1.7;
-}
-
-.markdown-content-wrapper ul, 
-.markdown-content-wrapper ol {
-  margin-left: 20px;
-  margin-bottom: 0.8em;
-}
-
-.markdown-content-wrapper li {
-  margin-bottom: 0.4em;
-}
-
-.markdown-content-wrapper blockquote {
-  border-left: 4px solid #008282; /* Teal for blockquote border */
-  margin-left: 0;
-  padding-left: 15px;
-  color: #555555;
-  font-style: italic;
-  background-color: #f1fcfc; /* Very light teal for blockquote background */
-}
-
-.markdown-content-wrapper pre {
-  background-color: #2d2d2d; 
-  color: #f8f8f2; 
-  padding: 15px;
-  border-radius: 4px;
-  overflow-x: auto; 
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
-  font-size: 0.9em;
-}
-
-.markdown-content-wrapper code {
-  background-color: #e9ecef; /* Light grey for inline code */
-  color: #c2185b; /* A pink/magenta for inline code text */
+.principle-inline-link {
+  background-color: #f0f8ff; /* AliceBlue - very light blue for subtle inline */
+  color: #005a9c; /* A darker, more readable blue */
   padding: 2px 5px;
-  border-radius: 3px;
-  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+  border-radius: 4px;
   font-size: 0.9em;
+  border: 1px solid #d6eaff;
+  text-decoration: none; /* remove underline from button-like link */
+  display: inline-block; /* Ensures it flows inline but can have padding */
+  vertical-align: baseline; /* Aligns with surrounding text */
+  margin: 0 2px; /* Small horizontal margin for breathing room */
+}
+.principle-inline-link:hover {
+  background-color: #e0f0ff;
+  border-color: #b3d7ff;
+  color: #003d6b;
+  text-decoration: none;
 }
 
-.markdown-content-wrapper pre code {
-  background-color: transparent; 
-  color: inherit; 
-  padding: 0;
-}
-
-.response-browser-page {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-@media (min-width: 768px) {
-  .response-browser-page {
-    flex-direction: row;
-  }
-  .filter-panel {
-    flex: 0 0 300px; /* Kept existing layout */
-    margin-bottom: 0;
-  }
-  .rfi-content-area { /* Changed from .response-list to .rfi-content-area */
-    flex: 1;
-    margin-top: 0;
-  }
-}
 
 .rfi-point-actions {
-  margin-top: 15px;
+  margin-top: 20px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.action-button {
+  background-color: #6c757d;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+}
+.action-button:hover {
+  background-color: #5a6268;
+}
+.action-button.disabled {
+  background-color: #adb5bd;
+  cursor: not-allowed;
+}
+
+/* RFI Structure Headers */
+.rfi-section-block, .rfi-subsection-block, .rfi-question-block {
+  margin-bottom: 25px;
+  padding-left: 10px; /* Indent content */
+  /* border-left: 3px solid #e0e0e0; Visual cue for structure */ /* Base removed, applied specifically below */
+}
+.rfi-section-block { 
+  border-left: 3px solid #007bff; 
+}
+.rfi-subsection-block { 
+  border-left: 2px solid #e0e0e0; /* Thinner and lighter gray */
+}
+.rfi-question-block { 
+  border-left: 2px solid #e0e0e0; /* Thinner and lighter gray */
+  margin-left: 5px; /* Optional: slightly indent questions further if desired */
+  padding-left: 5px;
+}
+
+
+.rfi-section-header, .rfi-subsection-header, .rfi-question-header {
+  color: #333;
+  margin-bottom: 15px;
+  position: relative; /* For deep link icon positioning */
+}
+.rfi-section-header { font-size: 1.8em; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+.rfi-subsection-header { font-size: 1.5em; border-bottom: 1px solid #eee; padding-bottom: 8px;}
+.rfi-question-header { font-size: 1.2em; color: #444; }
+
+
+/* Deep link icons */
+.deep-link-icon {
+  margin-left: 8px;
+  color: #aaa;
+  text-decoration: none;
+  font-weight: normal;
+  font-size: 0.9em;
+  visibility: hidden; /* Hidden by default */
+  transition: color 0.2s;
+}
+h2:hover .deep-link-icon, 
+h3:hover .deep-link-icon, 
+h4:hover .deep-link-icon,
+.response-card h3:hover .card-deep-link {
+  visibility: visible; /* Show on hover of header or card title */
+}
+.deep-link-icon:hover {
+  color: #007bff;
+}
+.card-deep-link { /* Specific for card to ensure it's always visible when card title hovered */
+ font-size: 1em; /* Make it slightly larger relative to card title */
+}
+
+/* Toast Notification */
+.toast-notification {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+.toast-notification.show {
+  opacity: 1;
+}
+
+/* CrossCuttingPrinciplesPage specific styles */
+.cross-cutting-principles-page {
+  max-width: 900px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  text-align: left;
+}
+
+.cross-cutting-principles-page h2 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+  font-size: 1.8em;
+}
+
+.cross-cutting-principles-page .page-intro {
+  font-size: 1.05em;
+  margin-bottom: 15px;
+  line-height: 1.7;
+  color: #444;
+}
+
+/* Renaming .principle-item to .principle-card for clarity from previous edits */
+.principle-card {
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  padding: 20px;
+  margin-bottom: 30px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.principle-card:last-child {
+  margin-bottom: 0;
+}
+
+.principle-card h3 {
+  font-size: 1.5em;
+  color: #0056b3;
+  margin-top: 0;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #ced4da;
+}
+
+.principle-details section {
+  margin-bottom: 20px;
+}
+.principle-details section:last-child {
+  margin-bottom: 0;
+}
+
+.principle-details h4 {
+  font-size: 1.15em;
+  color: #333;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.principle-details p {
+  margin-bottom: 10px;
+  line-height: 1.65;
+  color: #555;
+}
+
+.linked-rfi-questions strong {
+  display: block;
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 1.1em;
+  color: #333;
+}
+
+/* .linked-rfi-questions ul styles are mostly fine, ensure .text-link is styled nicely */
+.referenced-rfi-list {
+  list-style: none;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
 
-.action-button {
-  background-color: #f0f0f0;
-  border: 1px solid #ccc;
-  padding: 8px 12px;
-  border-radius: 4px;
-  cursor: pointer;
-  text-decoration: none;
-  color: #333;
-  font-size: 0.9em;
-  transition: background-color 0.2s ease, box-shadow 0.2s ease;
-}
-
-.action-button:hover {
-  background-color: #e0e0e0;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-.action-button.disabled {
+.referenced-rfi-list li button.text-link {
   background-color: #e9ecef;
-  color: #6c757d;
-  cursor: not-allowed;
-  opacity: 0.7;
+  border: 1px solid #ced4da;
+  color: #0056b3;
+  padding: 5px 10px;
+  border-radius: 4px;
+  font-size: 0.9em;
+  text-decoration: none;
+}
+.referenced-rfi-list li button.text-link:hover {
+  background-color: #dee2e6;
+  border-color: #adb5bd;
+  color: #003d80;
+  text-decoration: none;
 }
 
-/* Toast Notification */
-/* ... existing code ... */ 
+/* Error Message */
+.error-message {
+  color: red;
+  text-align: center;
+  padding: 20px;
+  font-size: 1.2em;
+}
+
+/* Helper class for screen readers */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .response-browser-page {
+    flex-direction: column;
+  }
+  .filter-panel {
+    width: 100%;
+    margin-bottom: 20px;
+    position: static; /* Remove sticky positioning on small screens */
+    max-height: none;
+  }
+  .App-header h1 {
+    font-size: 1.5em;
+  }
+  .main-nav {
+    flex-direction: column;
+    gap: 8px;
+  }
+} 

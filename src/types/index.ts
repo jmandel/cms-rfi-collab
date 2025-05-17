@@ -1,22 +1,25 @@
 export interface RfiPoint {
-  id: string; // Derived from point_key or a unique identifier
-  point_key: string; // e.g., "PATIENT-1_SUMMARY-1"
-  rfi_question_code: string; // e.g., "PC-1", "TD-8" - This should match RfiQuestion.question_id
+  id: string; // Will be populated with rfi_question_code
+  // point_key: string; // Removed, consolidated answers use rfi_question_code as primary ID
+  rfi_question_code: string; // e.g., "PC-1", "TD-8"
   short_title: string;
   summary: string;
-  markdown_content: string; // Changed from 'body' to 'markdown_content'
-  categories: string[]; // Array of category IDs, e.g., ["Audience_RFI_Section:Patient_Caregiver", "Core_Theme:Data_Access_Completeness"]
-  categoryIds?: Set<string>; // For optimized filtering
-  source_filename?: string; // The actual filename from rfi_points_markdown/
-  // Add any other fields that will be present in db.json
-  source_document?: string;
-  source_section?: string;
-  tags?: string[];
+  markdown_content: string;
+  categories: string[];
+  referenced_principles: string[]; // Added for Cross-Cutting Principles
+  categoryIds?: Set<string>; // For optimized filtering, will be populated in App.tsx
+  source_filename?: string;
+  rfi_question_text?: string; // Was missing, but present in build script frontmatter interface
+  // Remove fields not present in the consolidated frontmatter
+  // source_document?: string;
+  // source_section?: string;
+  // tags?: string[];
 }
 
-// ProcessedRfiPoint ensures categoryIds is always present after initial processing
-export type ProcessedRfiPoint = Omit<RfiPoint, 'categoryIds'> & {
-  categoryIds: Set<string>;
+// ProcessedRfiPoint ensures categoryIds is always present and a Set after initial processing.
+// It inherits all fields from RfiPoint, including referenced_principles.
+export type ProcessedRfiPoint = RfiPoint & {
+  categoryIds: Set<string>; 
 };
 
 export interface Category {
@@ -53,4 +56,12 @@ export interface RfiSection {
   subsections: RfiSubsection[];
 }
 
-export type RfiStructure = RfiSection[]; 
+export type RfiStructure = RfiSection[];
+
+// Add the new CrossCuttingPrinciple interface
+export interface CrossCuttingPrinciple {
+  key: string;
+  title: string;
+  problem: string;
+  capability: string;
+} 

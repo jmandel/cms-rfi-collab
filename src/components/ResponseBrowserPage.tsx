@@ -1,17 +1,19 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { ProcessedRfiPoint, CategoriesHierarchy, RfiStructure, RfiSection, RfiSubsection, RfiQuestion } from '../types';
-import FilterPanel from './FilterPanel';
+import { ProcessedRfiPoint, CategoriesHierarchy, RfiStructure, RfiSection, RfiSubsection, RfiQuestion, CrossCuttingPrinciple } from '../types';
+import FilterPanel, { PRINCIPLE_FILTER_PREFIX } from './FilterPanel';
 import ResponseCard from './ResponseCard';
 
 interface ResponseBrowserPageProps {
   allRfiPoints: ProcessedRfiPoint[];
   categoriesHierarchy: CategoriesHierarchy;
   rfiStructure: RfiStructure;
+  crossCuttingPrinciples: CrossCuttingPrinciple[];
+  onNavigateToPrinciple: (principleKey: string) => void;
 }
 
-const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints, categoriesHierarchy, rfiStructure }) => {
+const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints, categoriesHierarchy, rfiStructure, crossCuttingPrinciples, onNavigateToPrinciple }) => {
   const [activeFilters, setActiveFilters] = useState<Set<string>>(new Set());
-  const [categoryCountsFromAllPoints, setCategoryCountsFromAllPoints] = useState<Map<string, number>>(new Map());
+  const [categoryCounts, setCategoryCounts] = useState<Map<string, number>>(new Map());
 
   useEffect(() => {
     const queryParams = new URLSearchParams(window.location.search);
@@ -20,13 +22,13 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
       setActiveFilters(new Set(filtersFromUrl.split(',').filter(Boolean)));
     }
 
-    const counts = new Map<string, number>();
+    const catCounts = new Map<string, number>();
     allRfiPoints.forEach(point => {
       point.categoryIds.forEach(catId => {
-        counts.set(catId, (counts.get(catId) || 0) + 1);
+        catCounts.set(catId, (catCounts.get(catId) || 0) + 1);
       });
     });
-    setCategoryCountsFromAllPoints(counts);
+    setCategoryCounts(catCounts);
 
     if (window.location.hash) {
       const idToScroll = window.location.hash.substring(1);
@@ -66,14 +68,33 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const { activeCategoryFilters, activePrincipleFilters } = useMemo(() => {
+    const cats = new Set<string>();
+    const ccp = new Set<string>();
+    activeFilters.forEach(f => {
+      if (f.startsWith(PRINCIPLE_FILTER_PREFIX)) {
+        ccp.add(f.substring(PRINCIPLE_FILTER_PREFIX.length));
+      } else {
+        cats.add(f);
+      }
+    });
+    return { activeCategoryFilters: cats, activePrincipleFilters: ccp };
+  }, [activeFilters]);
+
   const filteredRfiPoints = useMemo(() => {
     if (activeFilters.size === 0) {
       return allRfiPoints;
     }
-    return allRfiPoints.filter(point => 
-      Array.from(activeFilters).some(filter => point.categoryIds.has(filter))
-    );
-  }, [allRfiPoints, activeFilters]);
+    return allRfiPoints.filter(point => {
+      const matchesCategories = activeCategoryFilters.size === 0 || 
+        Array.from(activeCategoryFilters).some(filter => point.categoryIds.has(filter));
+      
+      const matchesPrinciples = activePrincipleFilters.size === 0 ||
+        Array.from(activePrincipleFilters).some(filterKey => point.referenced_principles.includes(filterKey));
+
+      return matchesCategories && matchesPrinciples;
+    });
+  }, [allRfiPoints, activeFilters, activeCategoryFilters, activePrincipleFilters]);
 
   const pointsByQuestion = useMemo(() => {
     const map = new Map<string, ProcessedRfiPoint[]>();
@@ -88,42 +109,41 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
   const handleFilterChange = useCallback((filterId: string, isActive: boolean) => {
     setActiveFilters(prevFilters => {
       const newFilters = new Set(prevFilters);
-      let targetGroupId: string | undefined = undefined;
+      const isPrincipleFilter = filterId.startsWith(PRINCIPLE_FILTER_PREFIX);
 
-      for (const group of categoriesHierarchy.category_groups) {
-        if (group.categories.some(cat => cat.id === filterId)) {
-          targetGroupId = group.group_id;
-          break;
+      if (!isPrincipleFilter) {
+        let targetGroupId: string | undefined = undefined;
+        for (const group of categoriesHierarchy.category_groups) {
+          if (group.categories.some(cat => cat.id === filterId)) {
+            targetGroupId = group.group_id;
+            break;
+          }
         }
-      }
-
-      let filtersToUpdateInUrl = new Set<string>();
-
-      if (targetGroupId) {
-        const filtersToKeep = new Set<string>();
-        newFilters.forEach(activeFilterId => {
-          let activeFilterGroupId: string | undefined = undefined;
-          for (const group of categoriesHierarchy.category_groups) {
-            if (group.categories.some(cat => cat.id === activeFilterId)) {
-              activeFilterGroupId = group.group_id;
-              break;
+        if (targetGroupId) {
+          newFilters.forEach(activeFilterId => {
+            if (activeFilterId.startsWith(PRINCIPLE_FILTER_PREFIX)) return;
+            let activeFilterGroupId: string | undefined = undefined;
+            for (const group of categoriesHierarchy.category_groups) {
+              if (group.categories.some(cat => cat.id === activeFilterId)) {
+                activeFilterGroupId = group.group_id;
+                break;
+              }
             }
-          }
-          if (activeFilterGroupId === targetGroupId) {
-            filtersToKeep.add(activeFilterId);
-          }
-        });
-        filtersToUpdateInUrl = filtersToKeep;
+            if (activeFilterGroupId === targetGroupId && activeFilterId !== filterId) {
+              newFilters.delete(activeFilterId);
+            }
+          });
+        }
       }
       
       if (isActive) {
-        filtersToUpdateInUrl.add(filterId);
+        newFilters.add(filterId);
       } else {
-        filtersToUpdateInUrl.delete(filterId);
+        newFilters.delete(filterId);
       }
       
-      updateUrlWithFilters(filtersToUpdateInUrl);
-      return filtersToUpdateInUrl;
+      updateUrlWithFilters(newFilters);
+      return newFilters;
     });
   }, [categoriesHierarchy, updateUrlWithFilters]);
 
@@ -144,12 +164,13 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
   return (
     <div className="response-browser-page">
       <FilterPanel 
-        categoriesHierarchy={categoriesHierarchy} 
+        categoriesHierarchy={categoriesHierarchy}
+        crossCuttingPrinciples={crossCuttingPrinciples} 
+        allRfiPoints={allRfiPoints} 
         activeFilters={activeFilters} 
         onFilterChange={handleFilterChange} 
         onClearFilters={handleClearFilters} 
-        categoryCounts={categoryCountsFromAllPoints} 
-        categoryCountsForSorting={categoryCountsFromAllPoints} 
+        categoryCounts={categoryCounts} 
       />
       <div className="rfi-content-area">
         {rfiStructure.map((section: RfiSection) => {
@@ -170,13 +191,15 @@ const ResponseBrowserPage: React.FC<ResponseBrowserPageProps> = ({ allRfiPoints,
                   </h4>
                   <div className="response-list">
                     {relevantPoints.map(point => {
-                      const cardId = `point-${sanitizeForId(point.point_key)}`;
+                      const cardId = `point-${sanitizeForId(point.id)}`;
                       return (
                         <ResponseCard 
                           key={point.id} 
                           point={point} 
                           onCategoryClick={handleCategoryTagClick} 
-                          cardId={cardId} 
+                          cardId={cardId}
+                          crossCuttingPrinciples={crossCuttingPrinciples}
+                          onNavigateToPrinciple={onNavigateToPrinciple}
                         />
                       );
                     })}

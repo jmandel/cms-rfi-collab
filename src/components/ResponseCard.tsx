@@ -1,17 +1,25 @@
 import React, { useState, useEffect } from 'react';
-import { RfiPoint } from '../types';
-import MarkdownRenderer from './MarkdownRenderer'; // Imported
-import Toast from './Toast'; // Import Toast component
+import { RfiPoint, CrossCuttingPrinciple } from '../types';
+import MarkdownRenderer from './MarkdownRenderer';
+import Toast from './Toast';
 
 interface ResponseCardProps {
   point: RfiPoint;
   onCategoryClick?: (categoryId: string) => void;
-  cardId: string; // Unique ID for deep linking to this card
+  cardId: string;
+  crossCuttingPrinciples: CrossCuttingPrinciple[];
+  onNavigateToPrinciple: (principleKey: string) => void;
 }
 
-// Wrap the component with React.memo
-const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategoryClick, cardId }) => {
-  // State for Toast visibility
+const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
+
+const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ 
+  point, 
+  onCategoryClick, 
+  cardId, 
+  crossCuttingPrinciples, 
+  onNavigateToPrinciple 
+}) => {
   const [showToast, setShowToast] = useState(false);
   const [canShareNatively, setCanShareNatively] = useState(false);
 
@@ -22,51 +30,57 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
   }, []);
 
   const handleCopyText = async () => {
-    const textToCopy = `## ${point.short_title} (ID: ${point.id}, Question: ${point.rfi_question_code}, Key: ${point.point_key})\n\n**Summary:**\n${point.summary}\n\n**Body:**\n${point.markdown_content}`;
+    let textToCopy = `## ${point.short_title} (ID: ${point.id}, Question: ${point.rfi_question_code})\n\n**Summary:**\n${point.summary}\n\n**Body:**\n${point.markdown_content}`;
+
+    if (referencedPrinciplesDetails.length > 0) {
+      const principlesText = referencedPrinciplesDetails
+        .map(p => {
+          let principleDetail = `### Cross-Cutting Principle: ${p.key} - ${p.title}\n`;
+          if (p.problem) {
+            principleDetail += `**Problem:** ${p.problem}\n`;
+          }
+          if (p.capability) {
+            principleDetail += `**Capability:** ${p.capability}\n`;
+          }
+          return principleDetail;
+        })
+        .join('\n---\n'); // Separator between principles
+      textToCopy += `\n\n---\n**Referenced Cross-Cutting Principles:**\n\n${principlesText}`;
+    }
+
     try {
       await navigator.clipboard.writeText(textToCopy);
       setShowToast(true);
     } catch (err) {
       console.error('Failed to copy text: ', err);
-      setShowToast(true);
+      setShowToast(true); // Show toast even on error, maybe with a different message? For now, same.
     }
   };
   
-  // const MockMarkdownRenderer: React.FC<{content: string}> = ({content}) => ( ... ); // Removed
-
-  const githubBaseUrl = 'https://github.com/jmandel/cms-rfi-collab/blob/main/rfi_points_markdown'; // Updated repository name
-  // This logic assumes your markdown files are named like 'PC-10.md' or similar, derived from rfi_question_code.
-  // And that point_key refers to an anchor within them, or that the file is point_key.md
-  // A more robust solution would be to have a specific `source_filename` field in your `db.json`.
-  // For now, trying to link to a potential file named like point_key.md or rfi_question_code + .md
-  // This is highly speculative and needs to match your actual file structure in rfi_points_markdown/
   let constructedFileName = '';
   if (point.source_filename) {
     constructedFileName = point.source_filename;
-  } else if (point.rfi_question_code && point.point_key) { // Fallback to old heuristic
-    const questionCodeSlug = point.rfi_question_code.toLowerCase();
-    const pointKeySlug = point.point_key.toLowerCase().replace(/_/g, '-');
-    constructedFileName = `${questionCodeSlug}_${pointKeySlug}.md`;
+  } else if (point.rfi_question_code) { 
+    constructedFileName = `${point.rfi_question_code}.md`; 
   }
-
-  // Fallback if construction fails, though ideally it shouldn't if data is consistent.
+  
+  const githubBaseUrl = 'https://github.com/jmandel/cms-rfi-collab/blob/main/rfi_answers_consolidated';
   const githubLink = constructedFileName 
     ? `${githubBaseUrl}/${constructedFileName}` 
-    : undefined; // Set to undefined if no link can be made
+    : undefined;
 
   const getShareText = (): string => {
     if (point.summary && point.summary.trim() !== '') {
-      return point.summary; // Return full summary
+      return point.summary;
     }
-    // Basic stripping of markdown for summary if actual summary is not available
     const plainTextContent = point.markdown_content
-      .replace(/\n+/g, ' ') // Replace newlines with a space
-      .replace(/#+\s*/g, '') // Remove markdown headers
-      .replace(/\*\*/g, '')    // Remove bold/italics markers
-      .replace(/[\[\]\(\)]/g, '') // Remove link/image markdown syntax remnants
-      .replace(/<[^>]+>/g, '') // Remove any HTML tags
+      .replace(/\n+/g, ' ')
+      .replace(/#+\s*/g, '')
+      .replace(/\*\*/g, '')
+      .replace(/[\[\]\(\)]/g, '')
+      .replace(/<[^>]+>/g, '')
       .trim(); 
-    return plainTextContent; // Return full plain text content
+    return plainTextContent;
   };
 
   const deepLink = `${window.location.origin}${window.location.pathname}#${cardId}`;
@@ -80,42 +94,68 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
         url: deepLink,
       });
     } catch (error) {
+      console.warn('Native share failed:', error);
     }
   };
 
   const sortedCategories = point.categories ? [...point.categories].sort() : [];
 
+  const referencedPrinciplesDetails = point.referenced_principles
+    .map(key => crossCuttingPrinciples.find(p => p.key === key))
+    .filter(p => p !== undefined) as CrossCuttingPrinciple[];
+
   return (
     <div className="response-card" id={cardId}>
       <h3>
         {point.short_title}
-        <a href={`#${cardId}`} className="deep-link-icon card-deep-link" aria-label={`Link to RFI point ${point.point_key}`}>#</a>
+        <a href={`#${cardId}`} className="deep-link-icon card-deep-link" aria-label={`Link to RFI point ${point.id}`}>#</a>
       </h3>
       <div className="card-meta">
-        <span>ID: {point.id}</span> | 
-        <span>Question: {point.rfi_question_code}</span> | 
-        <span className="point-key-meta">Key: {point.point_key}</span>
+        {point.id === point.rfi_question_code ? (
+          <span>RFI Question: {point.rfi_question_code}</span>
+        ) : (
+          <span>RFI Question: {point.rfi_question_code} | Response ID: {point.id}</span>
+        )}
       </div>
-      <div className="summary-section">
+      <div className="summary-section summary-text-wrapper">
         <p className="summary-text">
           <strong>Summary:</strong> {point.summary}
         </p>
       </div>
       
       <div className="markdown-content-wrapper">
-        <MarkdownRenderer content={point.markdown_content} /> {/* Used actual component */}
-        {/* <MockMarkdownRenderer content={point.markdown_content} /> */}
+        <MarkdownRenderer 
+            content={point.markdown_content} 
+            onNavigateToPrinciple={onNavigateToPrinciple} 
+        />
       </div>
+
+      {referencedPrinciplesDetails.length > 0 && (
+        <div className="referenced-principles-container">
+          <strong>Supported by Principles:</strong>
+          {referencedPrinciplesDetails.map(principle => (
+            <button
+              type="button"
+              key={principle.key}
+              className="principle-tag clickable"
+              onClick={() => onNavigateToPrinciple(principle.key)}
+              title={`View principle: ${principle.key} - ${principle.title}`}
+            >
+              {principle.title}
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="categories-container">
         <strong>Categories:</strong>
         {sortedCategories.map(catString => {
           const categoryId = catString.split(':').pop() || catString;
           const categoryName = categoryId.replace(/_/g, ' ');
-          return { catString, categoryId, categoryName }; // Create objects for sorting
+          return { catString, categoryId, categoryName };
         })
-        .sort((a, b) => a.categoryName.localeCompare(b.categoryName)) // Sort alphabetically by name
-        .map(catObj => ( // Map over sorted array
+        .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
+        .map(catObj => (
           <button 
             type="button"
             key={catObj.catString} 
@@ -155,6 +195,6 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ point, onCategor
       {showToast && <Toast message="Full text copied to clipboard!" onClose={() => setShowToast(false)} />}
     </div>
   );
-}); // Close React.memo here
+});
 
 export default ResponseCard; 

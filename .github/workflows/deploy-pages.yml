@@ -40,6 +40,9 @@ jobs:
       - name: Build RFI JSON data
         run: bun run scripts/build-rfi-json.bun.ts > public/build/db.json
 
+      - name: Build Cross-Cutting Principles JSON data
+        run: bun run scripts/build-cc-json.bun.ts > public/build/cross_cutting_principles.json
+
       - name: Build application
         # This command assumes public/index.html is your HTML template which references src/index.tsx.
         # Bun will process public/index.html and its referenced scripts, outputting to ./build
