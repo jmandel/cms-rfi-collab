@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { CrossCuttingPrinciple, ProcessedRfiPoint } from '../types';
+import Toast from './Toast';
 // import { Link } from 'react-router-dom'; // Removed as not using React Router yet
 
 interface CrossCuttingPrinciplesPageProps {
@@ -9,8 +10,17 @@ interface CrossCuttingPrinciplesPageProps {
 }
 
 const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
+const GITHUB_CC_FILE_URL = 'https://github.com/jmandel/cms-rfi-collab/blob/main/cross_cutting_principles.md';
 
 const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({ principles, allRfiPoints, onNavigateToRfiQuestion }) => {
+  const [showToast, setShowToast] = useState(false);
+  const [canShareNatively, setCanShareNatively] = useState(false);
+
+  useEffect(() => {
+    if (typeof navigator.share === 'function') {
+      setCanShareNatively(true);
+    }
+  }, []);
 
   const rfiPointsByPrinciple = React.useMemo(() => {
     const map = new Map<string, ProcessedRfiPoint[]>();
@@ -28,6 +38,43 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
     });
     return map;
   }, [principles, allRfiPoints]);
+
+  const handleCopyPrinciple = useCallback(async (principle: CrossCuttingPrinciple) => {
+    const principleAnchorId = `cc-${sanitizeForId(principle.key)}`;
+    const deepLink = `${window.location.origin}${window.location.pathname}#${principleAnchorId}`;
+    let textToCopy = `## Cross-Cutting Principle: ${principle.title} (${principle.key})\n\n`;
+    if (principle.problem) {
+      textToCopy += `**Problem:**\n${principle.problem}\n\n`;
+    }
+    if (principle.capability) {
+      textToCopy += `**Capability:**\n${principle.capability}\n\n`;
+    }
+    textToCopy += `Link: ${deepLink}`;
+
+    try {
+      await navigator.clipboard.writeText(textToCopy);
+      setShowToast(true);
+    } catch (err) {
+      console.error('Failed to copy principle text: ', err);
+      // Optionally show an error toast or different message
+      setShowToast(true); 
+    }
+  }, []);
+
+  const handleSharePrinciple = useCallback(async (principle: CrossCuttingPrinciple) => {
+    const principleAnchorId = `cc-${sanitizeForId(principle.key)}`;
+    const deepLink = `${window.location.origin}${window.location.pathname}#${principleAnchorId}`;
+    const shareData: ShareData = {
+      title: `Principle: ${principle.title}`,
+      text: principle.problem || principle.capability || 'Cross-Cutting Principle from CMS RFI Responses',
+      url: deepLink,
+    };
+    try {
+      await navigator.share(shareData);
+    } catch (error) {
+      console.warn('Native share for principle failed:', error);
+    }
+  }, []);
 
   if (!principles || principles.length === 0) {
     return <p>No cross-cutting principles available.</p>;
@@ -63,7 +110,7 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
                 <p>{principle.capability}</p>
               </section>
               {uniqueQuestionCodes.length > 0 && (
-                <section>
+                <section className="linked-rfi-section">
                   <h4>Referenced in RFI Answers:</h4>
                   <ul className="referenced-rfi-list">
                     {uniqueQuestionCodes.map(qCode => (
@@ -86,9 +133,29 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
                 </section>
               )}
             </div>
+            <div className="principle-actions rfi-point-actions"> {/* Re-use rfi-point-actions for styling consistency */}
+              <button onClick={() => handleCopyPrinciple(principle)} className="action-button">
+                Copy Principle Text
+              </button>
+              {canShareNatively && (
+                <button onClick={() => handleSharePrinciple(principle)} className="action-button">
+                  Share Principle
+                </button>
+              )}
+              <a 
+                href={GITHUB_CC_FILE_URL} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="action-button"
+                title="View/Edit all principles on GitHub (cross_cutting_principles.md)"
+              >
+                View/Edit on GitHub
+              </a>
+            </div>
           </div>
         );
       })}
+      {showToast && <Toast message="Principle text copied to clipboard!" onClose={() => setShowToast(false)} />}
     </div>
   );
 };

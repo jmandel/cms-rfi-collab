@@ -15,7 +15,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function buildCrossCuttingPrinciplesJson() {
-    const ccFilePath = path.join(__dirname, '..', 'cross_cutting_concerns.md');
+    const ccFilePath = path.join(__dirname, '..', 'cross_cutting_principles.md');
     const principles: CrossCuttingPrinciple[] = [];
 
     try {

@@ -596,4 +596,12 @@ h4:hover .deep-link-icon,
     flex-direction: column;
     gap: 8px;
   }
+}
+
+/* Styles for actions on Principle Cards */
+.principle-actions {
+  /* .rfi-point-actions class is already applied for flex, gap, etc. */
+  margin-top: 20px; /* Ensure space above action buttons */
+  padding-top: 15px; /* Consistent padding */
+  border-top: 1px solid #eee; /* Consistent border */
 } 

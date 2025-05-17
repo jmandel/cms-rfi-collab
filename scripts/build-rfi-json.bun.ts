@@ -28,7 +28,7 @@ const genericLinkRegex = /\B\[[^\]]+\]\(#([\w_]+)\)/g; // Using \B to avoid matc
 
 // Helper function to get all valid CC_KEYs from the source markdown
 async function getKnownCrossCuttingPrincipleKeys(): Promise<Set<string>> {
-    const ccFilePath = path.join(__dirname, '..', 'cross_cutting_concerns.md');
+    const ccFilePath = path.join(__dirname, '..', 'cross_cutting_principles.md');
     const knownKeys = new Set<string>();
     try {
         const fileContent = await fs.readFile(ccFilePath, 'utf-8');
@@ -41,7 +41,7 @@ async function getKnownCrossCuttingPrincipleKeys(): Promise<Set<string>> {
             }
         }
     } catch (error) {
-        console.warn(`Warning: Could not read or parse cross_cutting_concerns.md to get known principle keys. Link detection might be less accurate.`, error);
+        console.warn(`Warning: Could not read or parse cross_cutting_principles.md to get known principle keys. Link detection might be less accurate.`, error);
     }
     return knownKeys;
 }
