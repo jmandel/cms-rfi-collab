@@ -62,6 +62,5 @@ export type RfiStructure = RfiSection[];
 export interface CrossCuttingPrinciple {
   key: string;
   title: string;
-  problem: string;
-  capability: string;
+  content: string; // Replaces problem and capability
 } 

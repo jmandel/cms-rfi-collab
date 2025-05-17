@@ -5,8 +5,7 @@ import { fileURLToPath } from 'url'; // Added for compatibility
 interface CrossCuttingPrinciple {
     key: string;
     title: string;
-    problem: string;
-    capability: string;
+    content: string; // Changed from problem and capability
     // Optional: referenced_in_rfi_questions?: string[]; // To be populated later if needed
 }
 
@@ -22,16 +21,15 @@ async function buildCrossCuttingPrinciplesJson() {
         const fileContent = await fs.readFile(ccFilePath, 'utf-8');
         const sections = fileContent.split(/\n---\n/); // Split by the "---" separator
 
-        const principleRegex = /### \d+\. ([\w_]+) — (.+?)\n\n\*\*Problem:\*\*([\s\S]+?)\n\n\*\*Capability:\*\*([\s\S]+)/;
+        const principleRegex = /### \d+\. ([\w_]+) — (.+?)\n\n([\s\S]+)/; // Updated regex
 
         for (const section of sections) {
             const match = section.trim().match(principleRegex);
             if (match) {
                 const key = match[1].trim();
                 const title = match[2].trim();
-                const problem = match[3].trim();
-                const capability = match[4].trim();
-                principles.push({ key, title, problem, capability });
+                const content = match[3].trim(); // Capture all content after title
+                principles.push({ key, title, content });
             }
         }
 

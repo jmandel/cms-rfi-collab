@@ -1,4 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import ReactMarkdown from 'react-markdown'; // Import ReactMarkdown
+import remarkGfm from 'remark-gfm'; // Import remark-gfm
 import { CrossCuttingPrinciple, ProcessedRfiPoint } from '../types';
 import Toast from './Toast';
 // import { Link } from 'react-router-dom'; // Removed as not using React Router yet
@@ -43,12 +45,7 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
     const principleAnchorId = `cc-${sanitizeForId(principle.key)}`;
     const deepLink = `${window.location.origin}${window.location.pathname}#${principleAnchorId}`;
     let textToCopy = `## Cross-Cutting Principle: ${principle.title} (${principle.key})\n\n`;
-    if (principle.problem) {
-      textToCopy += `**Problem:**\n${principle.problem}\n\n`;
-    }
-    if (principle.capability) {
-      textToCopy += `**Capability:**\n${principle.capability}\n\n`;
-    }
+    textToCopy += `${principle.content}\n\n`; // Use new content field
     textToCopy += `Link: ${deepLink}`;
 
     try {
@@ -66,7 +63,7 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
     const deepLink = `${window.location.origin}${window.location.pathname}#${principleAnchorId}`;
     const shareData: ShareData = {
       title: `Principle: ${principle.title}`,
-      text: principle.problem || principle.capability || 'Cross-Cutting Principle from CMS RFI Responses',
+      text: principle.content || 'Cross-Cutting Principle from CMS RFI Responses', // Use content field
       url: deepLink,
     };
     try {
@@ -101,14 +98,10 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
               <a href={`#${principleAnchorId}`} className="deep-link-icon" aria-label={`Link to principle ${principle.title}`}>#</a>
             </h3>
             <div className="principle-details">
-              <section>
-                <h4>Problem:</h4>
-                <p>{principle.problem}</p>
-              </section>
-              <section>
-                <h4>Capability:</h4>
-                <p>{principle.capability}</p>
-              </section>
+              {/* Render markdown content here */}
+              <div className="markdown-content">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>{principle.content}</ReactMarkdown>
+              </div>
               {uniqueQuestionCodes.length > 0 && (
                 <section className="linked-rfi-section">
                   <h4>Referenced in RFI Answers:</h4>
