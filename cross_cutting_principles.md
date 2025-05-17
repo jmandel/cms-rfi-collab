@@ -8,7 +8,18 @@ This document outlines foundational principles intended to guide the development
 
 **Problem:** The secure exchange of health information necessitates unambiguous identification of all participating entities (patients, providers, applications) and verifiable confirmation of their access privileges. Absent robust identity assurance and explicit authorization artefacts, systems cannot make reliable, policy-conformant access control decisions, thereby undermining trust and security.
 
-**Capability:** The ecosystem must support credentials proofed to NIST Identity Assurance Level 2 (IAL2) and authenticated at Authenticator Assurance Level 2 (AAL2) (e.g., Login.gov, compliant state-issued mobile Driver's Licenses, or equivalent Verifiable Credentials). Following successful authentication, an OAuth 2.0 / OpenID Connect flow should issue an access token. This token must encode granular, standardized scopes (e.g., SMART on FHIR scopes) and, when applicable, reference a machine-readable consent directive (e.g., a FHIR `Consent` resource). The token must be cryptographically bound to the authenticated identity, enabling resource servers to validate both identity and authorization with high assurance in a single, verifiable step. Identity proofing and authorization services may be distinct but must be coordinated to ensure this verifiable binding.
+**Capability:** The ecosystem's approach to identity and authorization must be built upon the following tenets:
+
+*   **Leverage a 'Narrow Waist' of Trusted Providers:** Centralize identity and authorization functions within a specialized set of trusted providers.
+    *   **Reduced Application Trust:** Individual applications should not need to be trusted to make assertions about user identity or what the user wishes to authorize; instead, they rely on these specialized providers.
+    *   **Enhanced Security:** This model limits the blast radius if any single application is compromised, as critical identity and authorization logic is not distributed across all applications.
+*   **Adherence to Robust Standards:**
+    *   Support credentials proofed to NIST Identity Assurance Level 2 (IAL2) and authenticated at Authenticator Assurance Level 2 (AAL2) (e.g., Login.gov, compliant state-issued mobile Driver\'s Licenses, or equivalent Verifiable Credentials).
+    *   Employ standard protocols (e.g., OAuth 2.0 / OpenID Connect flows) to issue a verifiable security credential. This credential must:
+        *   Encode granular, standardized scopes (e.g., SMART on FHIR scopes).
+        *   Reference machine-readable consent directives where applicable (e.g., a FHIR `Consent` resource).
+        *   Be cryptographically bound to the authenticated identity, enabling resource servers to validate both identity and authorization with high assurance.
+*   **Coordinated Services:** Ensure that identity proofing and authorization services, even if distinct, are effectively coordinated to maintain verifiable binding between identity and authorization decisions.
 
 ---
 
@@ -127,8 +138,6 @@ This layered strategy ensures a standardized floor (USCDI), promotes the evoluti
 **Problem:** Poorly designed, non-interoperable, or inefficient health information technology significantly contributes to provider burden, burnout, and detracts from patient care. Technology intended to support clinicians often becomes an impediment.
 
 **Capability:** A core objective in the design, development, and implementation of health IT systems and interoperability solutions must be the explicit reduction of provider burden. This involves: (i) ensuring high performance and reliability of all data access and exchange mechanisms; (ii) streamlining clinical workflows through intelligent integration of data and decision support (e.g., via CDS Hooks); (iii) automating administrative tasks (e.g., quality reporting data submission via performant Bulk FHIR APIs); and (iv) prioritizing user-centered design principles to enhance the intuitiveness and efficiency of clinical interfaces and tools. Technology should demonstrably simplify, not complicate, the provision of care.
-
----
 
 ---
 
