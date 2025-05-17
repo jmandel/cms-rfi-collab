@@ -2,23 +2,26 @@ import React, { useState, useEffect } from 'react';
 import { RfiPoint, CrossCuttingPrinciple } from '../types';
 import MarkdownRenderer from './MarkdownRenderer';
 import Toast from './Toast';
+import { LocState } from '../hooks/useHashLocation';
 
 interface ResponseCardProps {
+  loc: LocState;
+  buildHash: (state: LocState) => string;
   point: RfiPoint;
   onCategoryClick?: (categoryId: string) => void;
   cardId: string;
   crossCuttingPrinciples: CrossCuttingPrinciple[];
-  onNavigateToPrinciple: (principleKey: string) => void;
 }
 
 const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
 
 const ResponseCard: React.FC<ResponseCardProps> = React.memo(({ 
+  loc,
+  buildHash,
   point, 
   onCategoryClick, 
   cardId, 
   crossCuttingPrinciples, 
-  onNavigateToPrinciple 
 }) => {
   const [showToast, setShowToast] = useState(false);
   const [canShareNatively, setCanShareNatively] = useState(false);
@@ -35,14 +38,7 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({
     if (referencedPrinciplesDetails.length > 0) {
       const principlesText = referencedPrinciplesDetails
         .map(p => {
-          let principleDetail = `### Cross-Cutting Principle: ${p.key} - ${p.title}\n`;
-          if (p.problem) {
-            principleDetail += `**Problem:** ${p.problem}\n`;
-          }
-          if (p.capability) {
-            principleDetail += `**Capability:** ${p.capability}\n`;
-          }
-          return principleDetail;
+          return `### Cross-Cutting Principle: ${p.key} - ${p.title}\n${p.content}`;
         })
         .join('\n---\n'); // Separator between principles
       textToCopy += `\n\n---\n**Referenced Cross-Cutting Principles:**\n\n${principlesText}`;
@@ -126,24 +122,27 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({
       <div className="markdown-content-wrapper">
         <MarkdownRenderer 
             content={point.markdown_content} 
-            onNavigateToPrinciple={onNavigateToPrinciple} 
+            loc={loc}
+            buildHash={buildHash}
         />
       </div>
 
       {referencedPrinciplesDetails.length > 0 && (
         <div className="referenced-principles-container">
           <strong>Supported by Principles:</strong>
-          {referencedPrinciplesDetails.map(principle => (
-            <button
-              type="button"
+          {referencedPrinciplesDetails.map(principle => {
+            const principleLink = `#${buildHash({ ...loc, page: 'principles', anchor: `cc-${principle.key}`, filters: new Set() })}`
+            return (
+            <a
+              href={principleLink}
               key={principle.key}
               className="principle-tag clickable"
-              onClick={() => onNavigateToPrinciple(principle.key)}
               title={`View principle: ${principle.key} - ${principle.title}`}
             >
               {principle.title}
-            </button>
-          ))}
+            </a>
+            );
+          })}
         </div>
       )}
 
@@ -155,17 +154,41 @@ const ResponseCard: React.FC<ResponseCardProps> = React.memo(({
           return { catString, categoryId, categoryName };
         })
         .sort((a, b) => a.categoryName.localeCompare(b.categoryName))
-        .map(catObj => (
-          <button 
-            type="button"
-            key={catObj.catString} 
+        .map(catObj => {
+          const targetFilters = new Set([catObj.categoryId]);
+          // Ensure page is browser, set anchor to filter panel
+          const targetHash = buildHash({ 
+            ...loc, // preserve current page and anchor unless specified
+            page: 'browser', // Explicitly set page to browser
+            filters: targetFilters, 
+            anchor: 'filter-panel' 
+          });
+          return (
+          // <button 
+          //   type="button"
+          //   key={catObj.catString} 
+          //   className="category-tag clickable"
+          //   onClick={() => onCategoryClick && onCategoryClick(catObj.categoryId)}
+          //   title={`Filter by category: ${catObj.categoryName}`}
+          // >
+          //   {catObj.categoryName} 
+          // </button>
+          <a
+            href={`#${targetHash}`}
+            key={catObj.catString}
             className="category-tag clickable"
-            onClick={() => onCategoryClick && onCategoryClick(catObj.categoryId)}
+            onClick={(e) => {
+              e.preventDefault();
+              if (onCategoryClick) {
+                onCategoryClick(catObj.categoryId);
+              }
+            }}
             title={`Filter by category: ${catObj.categoryName}`}
           >
-            {catObj.categoryName} 
-          </button>
-        ))}
+            {catObj.categoryName}
+          </a>
+          );
+        })}
       </div>
 
       <div className="rfi-point-actions">

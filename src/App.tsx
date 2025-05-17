@@ -1,9 +1,12 @@
 // src/App.tsx
-import React, { useState, useCallback, useEffect } from 'react';
+import React from 'react';
 import { CategoriesHierarchy, RfiPoint, ProcessedRfiPoint, RfiStructure, CrossCuttingPrinciple } from './types';
 import ResponseBrowserPage from './components/ResponseBrowserPage';
 import CrossCuttingPrinciplesPage from './components/CrossCuttingPrinciplesPage';
 import './styles/global.css'; // Import global styles
+
+import { useHashLocation, buildHash } from './hooks/useHashLocation';
+import { useScrollOnAnchor } from './hooks/useScrollOnAnchor';
 
 // Directly import the JSON data
 // Note: Adjust paths if your bundler configuration or file structure is different
@@ -31,84 +34,43 @@ const processedRfiPoints: ProcessedRfiPoint[] = rfiPointsData.map(point => ({
 // Helper to sanitize IDs for URL fragments
 const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
 
-type PageView = 'browser' | 'principles';
+// type PageView = 'browser' | 'principles';
 
 function App() {
-  const [currentPage, setCurrentPage] = useState<PageView>('browser');
+  // const [currentPage, setCurrentPage] = useState<PageView>('browser');
+  const [loc, setLoc] = useHashLocation();
+  useScrollOnAnchor(loc.anchor);
+
   const readmeIntroLink = "https://github.com/jmandel/cms-rfi-collab/blob/main/README.md#introduction-responding-to-the-cms-health-technology-ecosystem-rfi";
 
-  useEffect(() => {
-    const handlePopState = () => {
-      const hash = window.location.hash.substring(1);
-      let newPage = currentPage; // Default to current, might be changed by hash
+  // useEffect(() => {
+  //   const handlePopState = () => {
+  //     const hash = window.location.hash.substring(1);
+  //     let newPage = currentPage; // Default to current, might be changed by hash
+  // ... existing code ...
+  //     }
+  //   };
 
-      if (hash.startsWith('rfi-q-') || hash.startsWith('rfi-sec-') || hash.startsWith('rfi-subsec-') || hash.startsWith('point-')) {
-        newPage = 'browser';
-      } else if (hash.startsWith('cc-')) {
-        newPage = 'principles';
-      } else if (!hash) {
-        // If hash is empty, it might be due to clicking main nav buttons.
-        // The primary mechanism for page change via nav buttons is their own onClick. 
-        // This popstate is more for back/forward. If hash is empty on back/forward, 
-        // we might infer page from current path or simply not change it if not clear.
-        // For now, if hash is empty, we don't force a page change here, 
-        // assuming the page was already set correctly if user used nav buttons.
-      }
+  //   window.addEventListener('popstate', handlePopState);
+  //   // Call on mount to handle initial URL state (e.g. deep link with hash)
+  //   handlePopState(); 
 
-      if (newPage !== currentPage) {
-        setCurrentPage(newPage);
-      }
+  //   return () => window.removeEventListener('popstate', handlePopState);
+  // }, [currentPage, setCurrentPage]); // Dependencies
 
-      // Attempt to scroll if a hash is present.
-      // This scroll should ideally occur after the newPage has been rendered.
-      if (hash) {
-        setTimeout(() => {
-          const element = document.getElementById(hash);
-          if (element) {
-            element.scrollIntoView({ behavior: 'auto', block: 'start' });
-          } else {
-            console.warn(`Popstate: Could not find element with ID ${hash} to scroll to.`);
-          }
-        }, 50); // Small delay for DOM update after setCurrentPage
-      }
-    };
+  // // Callback to switch to browser and scroll to a question
+  // const handleNavigateToRfiQuestion = useCallback((questionId: string) => {
+  //   setCurrentPage('browser');
+  // ... existing code ...
+  //   }, 0);
+  // }, []);
 
-    window.addEventListener('popstate', handlePopState);
-    // Call on mount to handle initial URL state (e.g. deep link with hash)
-    handlePopState(); 
-
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, [currentPage, setCurrentPage]); // Dependencies
-
-  // Callback to switch to browser and scroll to a question
-  const handleNavigateToRfiQuestion = useCallback((questionId: string) => {
-    setCurrentPage('browser');
-    setTimeout(() => {
-      const targetId = `rfi-q-${sanitizeForId(questionId)}`;
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'auto', block: 'start' });
-        window.location.hash = targetId; // Also update hash for consistency and direct linkability
-      } else {
-        console.warn(`Could not find element with ID ${targetId} to scroll to.`);
-      }
-    }, 0);
-  }, []);
-
-  // New callback for navigating to a principle section on the Principles Page
-  const handleNavigateToPrincipleSection = useCallback((principleKey: string) => {
-    setCurrentPage('principles');
-    setTimeout(() => {
-      const targetId = `cc-${sanitizeForId(principleKey)}`; // Matches ID format in CrossCuttingPrinciplesPage
-      const element = document.getElementById(targetId);
-      if (element) {
-        element.scrollIntoView({ behavior: 'auto', block: 'start' });
-        window.location.hash = targetId; // Also update hash
-      } else {
-        console.warn(`Could not find element with ID ${targetId} to scroll to.`);
-      }
-    }, 0);
-  }, []);
+  // // New callback for navigating to a principle section on the Principles Page
+  // const handleNavigateToPrincipleSection = useCallback((principleKey: string) => {
+  //   setCurrentPage('principles');
+  // ... existing code ...
+  //   }, 0);
+  // }, []);
 
   if (!processedRfiPoints || !categoriesHierarchyData || !rfiStructureData || !crossCuttingPrinciplesData) {
     // This basic check might not be sufficient if files are empty but valid JSON (e.g., [])
@@ -122,12 +84,18 @@ function App() {
       <header className="App-header">
         <h1>CMS RFI: Draft Response Browser</h1>
         <nav className="main-nav">
-          <button onClick={() => { setCurrentPage('browser'); window.location.hash = ''; }} className={currentPage === 'browser' ? 'active' : ''}>
+          {/* <button onClick={() => { setCurrentPage('browser'); window.location.hash = ''; }} className={currentPage === 'browser' ? 'active' : ''}>
             RFI Browser
           </button>
           <button onClick={() => { setCurrentPage('principles'); window.location.hash = ''; }} className={currentPage === 'principles' ? 'active' : ''}>
             Cross-Cutting Principles
-          </button>
+          </button> */}
+          <a href="#page=browser" onClick={(e) => { e.preventDefault(); setLoc({ page: 'browser' }, true); }} className={loc.page === 'browser' ? 'active' : ''}>
+            RFI Browser
+          </a>
+          <a href="#page=principles" onClick={(e) => { e.preventDefault(); setLoc({ page: 'principles' }, true); }} className={loc.page === 'principles' ? 'active' : ''}>
+            Cross-Cutting Principles
+          </a>
           <a 
             href={readmeIntroLink} 
             target="_blank" 
@@ -141,20 +109,27 @@ function App() {
         </nav>
       </header>
 
-      {currentPage === 'browser' && (
+      {/* {currentPage === 'browser' && ( */}
+      {loc.page === 'browser' && (
         <ResponseBrowserPage 
+          key={loc.page}
+          loc={loc}
+          setLoc={setLoc}
           allRfiPoints={processedRfiPoints}
           categoriesHierarchy={categoriesHierarchyData} 
           rfiStructure={rfiStructureData}
           crossCuttingPrinciples={crossCuttingPrinciplesData}
-          onNavigateToPrinciple={handleNavigateToPrincipleSection}
         />
       )}
-      {currentPage === 'principles' && (
+      {/* {currentPage === 'principles' && ( */}
+      {loc.page === 'principles' && (
         <CrossCuttingPrinciplesPage 
+          key={loc.page}
+          loc={loc}
+          setLoc={setLoc}
+          buildHash={buildHash}
           principles={crossCuttingPrinciplesData}
           allRfiPoints={processedRfiPoints}
-          onNavigateToRfiQuestion={handleNavigateToRfiQuestion}
         />
       )}
 

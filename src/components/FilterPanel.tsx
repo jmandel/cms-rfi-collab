@@ -1,25 +1,26 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { CategoriesHierarchy, CategoryGroup, Category, CrossCuttingPrinciple, ProcessedRfiPoint } from '../types';
+import { LocState, buildHash as importedBuildHash } from '../hooks/useHashLocation'; // Renamed to avoid conflict if also passed as prop
 
 export const PRINCIPLE_FILTER_PREFIX = 'ccp:';
 
 interface FilterPanelProps {
+  loc: LocState;
+  setLoc: (draft: Partial<LocState>, push?: boolean) => void;
+  buildHash: (state: LocState) => string; // Expect buildHash as a prop
   categoriesHierarchy: CategoriesHierarchy;
   crossCuttingPrinciples: CrossCuttingPrinciple[];
   allRfiPoints: ProcessedRfiPoint[];
-  activeFilters: Set<string>;
-  onFilterChange: (filterId: string, isActive: boolean) => void;
-  onClearFilters: () => void;
   categoryCounts: Map<string, number>;
 }
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ 
+  loc,
+  setLoc,
+  buildHash, // Use passed buildHash prop
   categoriesHierarchy, 
   crossCuttingPrinciples,
   allRfiPoints,
-  activeFilters, 
-  onFilterChange, 
-  onClearFilters, 
   categoryCounts,
 }) => {
   const [expandedCategoryGroups, setExpandedCategoryGroups] = useState<Set<string>>(new Set());
@@ -81,48 +82,109 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
     });
   }, [crossCuttingPrinciples, principleCounts]);
 
+  const handleFilterItemClick = (filterId: string, isPrinciple: boolean, /* categoryGroupId?: string */) => {
+    const newFilters = new Set(loc.filters);
+
+    if (!isPrinciple) {
+      // Single selection across ALL category filters
+      // First, collect all *current* category filters to check if the clicked one is active
+      const currentCategoryFilters = new Set<string>();
+      loc.filters.forEach(f => {
+        if (!f.startsWith(PRINCIPLE_FILTER_PREFIX)) {
+          currentCategoryFilters.add(f);
+        }
+      });
+
+      // Clear all existing category filters from newFilters
+      currentCategoryFilters.forEach(f => newFilters.delete(f));
+
+      // If the clicked filter was not the one just cleared (or if no category filter was active),
+      // add it. This achieves toggling: click active to deactivate, click inactive to activate (and deactivate others).
+      if (!currentCategoryFilters.has(filterId) || currentCategoryFilters.size > 1) { // size > 1 condition is redundant if we clear all first
+         newFilters.add(filterId);
+      } // If currentCategoryFilters.has(filterId) and size was 1, it means it was the sole active one, and clearing it above achieved deselection.
+      
+    } else {
+      // Principle filters: toggle as before (multi-select)
+      if (newFilters.has(filterId)) {
+        newFilters.delete(filterId);
+      } else {
+        newFilters.add(filterId);
+      }
+    }
+
+    setLoc({ filters: newFilters });
+  };
+
   return (
-    <div className="filter-panel">
+    <div className="filter-panel" id="filter-panel">
       <div className="filter-panel-header">
         <h3>Filter Options</h3>
-        <button onClick={onClearFilters} disabled={activeFilters.size === 0}>
+        <a 
+          href={`#${buildHash({ ...loc, filters: new Set() })}`}
+          onClick={(e) => { 
+            e.preventDefault(); 
+            setLoc({ filters: new Set() }); 
+          }}
+          className={`clear-filters-link ${loc.filters.size === 0 ? 'disabled-link' : ''}`}
+          aria-disabled={loc.filters.size === 0}
+        >
           Clear All Filters
-        </button>
+        </a>
       </div>
       
-      <div className="filter-section">
-        <h4 onClick={() => setExpandedCategoryGroups(prev => prev.size === sortedCategoryGroups.length ? new Set() : new Set(sortedCategoryGroups.map(g => g.group_id)))} className="filter-section-header">
-            Filter by Category {expandedCategoryGroups.size === sortedCategoryGroups.length ? '▼' : '▶'}
-        </h4>
-        {sortedCategoryGroups.map((group: CategoryGroup) => (
-          <div key={group.group_id} className="filter-group">
-            <h5 onClick={() => toggleCategoryGroup(group.group_id)}>
-              {group.group_name} {expandedCategoryGroups.has(group.group_id) ? '▼' : '▶'}
-            </h5>
-            {expandedCategoryGroups.has(group.group_id) && (
-              <ul>
-                {group.categories.map((category: Category) => {
-                  const displayCount = categoryCounts.get(category.id) || 0;
-                  return (
-                    <li key={category.id}>
-                      <label title={`${category.name} - ${displayCount} item${displayCount === 1 ? '' : 's'}`}>
-                        <input 
-                          type="checkbox" 
-                          checked={activeFilters.has(category.id)}
-                          onChange={(e) => onFilterChange(category.id, e.target.checked)}
-                          disabled={displayCount === 0 && !activeFilters.has(category.id)}
-                        />
-                        <span className="filter-item-title">{category.name}</span>
-                        <span className="filter-item-count">({displayCount})</span>
-                      </label>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        ))}
-      </div>
+      {sortedCategoryGroups.map((group: CategoryGroup) => (
+        <div key={group.group_id} className="filter-group filter-section">
+          <h5 onClick={() => toggleCategoryGroup(group.group_id)}>
+            {group.group_name} {expandedCategoryGroups.has(group.group_id) ? '▼' : '▶'}
+          </h5>
+          {expandedCategoryGroups.has(group.group_id) && (
+            <ul className="filter-list">
+              {group.categories.map((category: Category) => {
+                const displayCount = categoryCounts.get(category.id) || 0;
+                const isActive = loc.filters.has(category.id);
+                
+                // Logic for Href (simulates the click for direct navigation / new tab)
+                const newFiltersForHref = new Set(loc.filters);
+                // Clear all *other* category filters for href
+                loc.filters.forEach(f => {
+                  if (!f.startsWith(PRINCIPLE_FILTER_PREFIX) && f !== category.id) {
+                    newFiltersForHref.delete(f);
+                  }
+                });
+                // Toggle the current category.id for href
+                if (newFiltersForHref.has(category.id)) { // If it's still there (was the one clicked or only one active)
+                  newFiltersForHref.delete(category.id); 
+                } else {
+                  newFiltersForHref.add(category.id); // Add it if it wasn't active or was cleared with others
+                }
+                
+                const targetHash = buildHash({ ...loc, filters: newFiltersForHref });
+
+                return (
+                  <li key={category.id} className={`filter-item ${isActive ? 'active' : ''} ${displayCount === 0 && !isActive ? 'disabled' : ''}`}>
+                    <a 
+                      href={`#${targetHash}`}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        if (!(displayCount === 0 && !isActive)) { // Prevent action if disabled
+                          handleFilterItemClick(category.id, false /*, group.group_id */); // categoryGroupId no longer needed here
+                        }
+                      }}
+                      className={`filter-action-link ${isActive ? 'active' : ''}`}
+                      aria-current={isActive ? 'page' : undefined} // 'page' is better for current links
+                      aria-disabled={displayCount === 0 && !isActive}
+                    >
+                      <span className="filter-item-title">{category.name}</span>
+                      <span className="filter-item-count">({displayCount})</span>
+                    </a>
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
+      ))}
 
       {sortedPrinciples.length > 0 && (
         <div className="filter-section principle-filter-section">
@@ -131,22 +193,35 @@ const FilterPanel: React.FC<FilterPanelProps> = ({
           </h4>
           {isPrinciplesExpanded && (
             <div className="filter-group">
-              <ul>
+              <ul className="filter-list"> {/* Changed class to filter-list */}
                 {sortedPrinciples.map((principle: CrossCuttingPrinciple) => {
                   const displayCount = principleCounts.get(principle.key) || 0;
                   const filterKey = `${PRINCIPLE_FILTER_PREFIX}${principle.key}`;
+                  const isActive = loc.filters.has(filterKey);
+                  
+                  const newFiltersForHref = new Set(loc.filters);
+                  // For principles, assume multi-select still, so just toggle for href
+                  if (newFiltersForHref.has(filterKey)) newFiltersForHref.delete(filterKey);
+                  else newFiltersForHref.add(filterKey);
+                  const targetHash = buildHash({ ...loc, filters: newFiltersForHref });
+
                   return (
-                    <li key={principle.key}>
-                      <label title={`${principle.title} (${principle.key}) - ${displayCount} item${displayCount === 1 ? '' : 's'}`}>
-                        <input 
-                          type="checkbox" 
-                          checked={activeFilters.has(filterKey)}
-                          onChange={(e) => onFilterChange(filterKey, e.target.checked)}
-                          disabled={displayCount === 0 && !activeFilters.has(filterKey)}
-                        />
+                    <li key={principle.key} className={`filter-item ${isActive ? 'active' : ''} ${displayCount === 0 && !isActive ? 'disabled' : ''}`}>
+                      <a 
+                        href={`#${targetHash}`}
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!(displayCount === 0 && !isActive)) { // Prevent action if disabled
+                             handleFilterItemClick(filterKey, true);
+                          }
+                        }}
+                        className={`filter-action-link ${isActive ? 'active' : ''}`}
+                        aria-current={isActive ? 'page' : undefined}
+                        aria-disabled={displayCount === 0 && !isActive}
+                      >
                         <span className="filter-item-title">{principle.title}</span>
                         <span className="filter-item-count">({displayCount})</span>
-                      </label>
+                      </a>
                     </li>
                   );
                 })}

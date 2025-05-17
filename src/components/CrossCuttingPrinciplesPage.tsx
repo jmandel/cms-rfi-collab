@@ -3,18 +3,29 @@ import ReactMarkdown from 'react-markdown'; // Import ReactMarkdown
 import remarkGfm from 'remark-gfm'; // Import remark-gfm
 import { CrossCuttingPrinciple, ProcessedRfiPoint } from '../types';
 import Toast from './Toast';
+import { LocState } from '../hooks/useHashLocation'; // Import LocState
 // import { Link } from 'react-router-dom'; // Removed as not using React Router yet
 
 interface CrossCuttingPrinciplesPageProps {
+  loc: LocState;
+  setLoc: (draft: Partial<LocState>, push?: boolean) => void;
+  buildHash: (state: LocState) => string;
   principles: CrossCuttingPrinciple[];
   allRfiPoints: ProcessedRfiPoint[];
-  onNavigateToRfiQuestion: (questionId: string) => void; // Callback to handle navigation
+  // onNavigateToRfiQuestion: (questionId: string) => void; // Removed
 }
 
 const sanitizeForId = (text: string) => text.replace(/\W/g, '-');
 const GITHUB_CC_FILE_URL = 'https://github.com/jmandel/cms-rfi-collab/blob/main/cross_cutting_principles.md';
 
-const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({ principles, allRfiPoints, onNavigateToRfiQuestion }) => {
+const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({ 
+  loc, 
+  setLoc, 
+  buildHash, 
+  principles, 
+  allRfiPoints, 
+  // onNavigateToRfiQuestion // Removed
+}) => {
   const [showToast, setShowToast] = useState(false);
   const [canShareNatively, setCanShareNatively] = useState(false);
 
@@ -106,22 +117,39 @@ const CrossCuttingPrinciplesPage: React.FC<CrossCuttingPrinciplesPageProps> = ({
                 <section className="linked-rfi-section">
                   <h4>Referenced in RFI Answers:</h4>
                   <ul className="referenced-rfi-list">
-                    {uniqueQuestionCodes.map(qCode => (
+                    {uniqueQuestionCodes.map(qCode => {
+                      const questionAnchor = `rfi-q-${sanitizeForId(qCode)}`;
+                      // Keep existing filters or clear? User example: #page=browser&anchor=rfi-q-PC-10 (no filters)
+                      // Let's clear filters for now, can be adjusted.
+                      const targetHash = buildHash({
+                        // ...loc, // Spreading loc would bring its filters, page, anchor
+                        page: 'browser',
+                        anchor: questionAnchor,
+                        filters: new Set() // Clear filters
+                      });
+                      return (
                       <li key={qCode}>
-                        {/* 
-                          This uses a callback for navigation. 
-                          If using React Router, this would be a <Link> component.
-                          Example: <Link to={`/?q=${qCode}#rfi-q-${sanitizeForId(qCode)}`}>{qCode}</Link> 
-                        */}
-                        <button 
+                        {/* <button 
                           onClick={() => onNavigateToRfiQuestion(qCode)} 
                           className="text-link"
                           title={`View RFI answers for ${qCode}`}
                         >
                           {qCode}
-                        </button>
+                        </button> */}
+                        <a 
+                          href={`#${targetHash}`}
+                          // onClick={(e) => { // Optional: use setLoc if more complex state change needed
+                          //   e.preventDefault();
+                          //   setLoc({ page: 'browser', anchor: questionAnchor, filters: new Set() });
+                          // }}
+                          className="text-link"
+                          title={`View RFI answers for ${qCode}`}
+                        >
+                          {qCode}
+                        </a>
                       </li>
-                    ))}
+                      );
+                    })}
                   </ul>
                 </section>
               )}

@@ -538,23 +538,41 @@ h4:hover .deep-link-icon,
   padding: 0;
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px; /* Adjusted gap for pills */
 }
 
-.referenced-rfi-list li button.text-link {
-  background-color: #e9ecef;
-  border: 1px solid #ced4da;
+/* .referenced-rfi-list li button.text-link { */
+.referenced-rfi-list li a.text-link {
+  /* background-color: #e9ecef; */
+  /* border: 1px solid #ced4da; */
+  /* color: #0056b3; */
+  /* padding: 5px 10px; */
+  /* border-radius: 4px; */
+  /* font-size: 0.9em; */
+  /* text-decoration: none; */
+  display: inline-block;
+  padding: 6px 12px;
+  margin: 2px; /* Small margin around each pill */
+  border-radius: 15px; /* Pill shape */
+  font-size: 0.85em;
+  font-weight: 500;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  background-color: #e7f3ff; /* Light blue - similar to category tags */
   color: #0056b3;
-  padding: 5px 10px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  text-decoration: none;
+  border: 1px solid #b3d7ff;
 }
-.referenced-rfi-list li button.text-link:hover {
-  background-color: #dee2e6;
-  border-color: #adb5bd;
-  color: #003d80;
-  text-decoration: none;
+
+/* .referenced-rfi-list li button.text-link:hover { */
+.referenced-rfi-list li a.text-link:hover {
+  /* background-color: #dee2e6; */
+  /* border-color: #adb5bd; */
+  /* color: #003d80; */
+  /* text-decoration: none; */
+  background-color: #cce4ff;
+  border-color: #80bfff;
+  color: #003d6b;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 /* Error Message */
@@ -604,4 +622,65 @@ h4:hover .deep-link-icon,
   margin-top: 20px; /* Ensure space above action buttons */
   padding-top: 15px; /* Consistent padding */
   border-top: 1px solid #eee; /* Consistent border */
+}
+
+/* Styles for FilterPanel text alignment */
+.filter-panel .filter-section-header,
+.filter-panel .filter-group > h5 {
+  text-align: left;
+}
+
+.filter-group ul.filter-list {
+  list-style: none;
+  padding-left: 0; /* Remove default ul padding */
+  margin-top: 5px;
+}
+
+.filter-list .filter-item {
+  margin-bottom: 2px; /* Small space between items */
+}
+
+.filter-list .filter-action-link {
+  display: flex; /* Use flex to align title and count */
+  justify-content: space-between; /* Push count to the right */
+  align-items: center;
+  padding: 6px 8px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: #337ab7; /* Standard link color */
+  background-color: #f9f9f9;
+  border: 1px solid #eee;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.filter-list .filter-action-link:hover {
+  background-color: #f0f0f0;
+  border-color: #ddd;
+  color: #23527c;
+}
+
+.filter-list .filter-item.active .filter-action-link {
+  background-color: #e7f3ff; /* Light blue for active */
+  color: #0056b3;
+  border-color: #b3d7ff;
+  font-weight: bold;
+}
+
+.filter-list .filter-item.disabled .filter-action-link {
+  color: #aaa;
+  background-color: #fdfdfd;
+  cursor: not-allowed;
+  pointer-events: none; /* Disable click events on the link itself */
+}
+
+.filter-list .filter-item.disabled .filter-action-link .filter-item-title,
+.filter-list .filter-item.disabled .filter-action-link .filter-item-count {
+  color: #bbb; /* Ensure text inside disabled link is also greyed out */
+}
+
+.filter-panel .clear-filters-link.disabled-link {
+  color: #aaa;
+  pointer-events: none;
+  text-decoration: none;
+  cursor: default;
 } 
