@@ -298,6 +298,21 @@ async function generateSite() {
     }
     .site-header .site-title { font-size: 1.1rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
     .site-header .menu-toggle { display: none; background: none; border: 1px solid var(--primary-blue); color: var(--primary-blue); padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; border-radius: 0.25rem; margin-right: 0.5rem; }
+    /* Styles for the moved single-pane toggle */
+    .site-header > input[type="checkbox"]#single-pane-toggle {
+      margin-left: 0.25rem; /* Space from menu button */
+      margin-right: 0.25rem;
+      cursor: pointer;
+      /* vertical-align: middle; -- Handled by flex parent's align-items: center */
+    }
+    .site-header > label[for="single-pane-toggle"] {
+      margin-right: 0.75rem; /* Space before title */
+      font-size: 0.875rem;
+      white-space: nowrap;
+      cursor: pointer;
+      user-select: none;
+      color: var(--text-light);
+    }
     .header-control-group { display: flex; align-items: center; margin-left: auto; /* Pushes it to the right */ }
     .header-control-group label { margin-right: 0.75rem; font-size: 0.875rem; white-space: nowrap; cursor: pointer; user-select: none; color: var(--text-light); }
     .header-control-group input[type="checkbox"] { margin-right: 0.25rem; cursor: pointer; vertical-align: middle;}
@@ -471,6 +486,12 @@ async function generateSite() {
     @media (max-width: 1023px) { /* Mobile/Tablet layout (already somewhat single-flow) */
       .site-header .menu-toggle { display: block; }
       .site-header .site-title { font-size: 1rem; max-width: calc(100% - 180px); /* Adjusted for more controls */ }
+      /* Style for the moved label in mobile view */
+      .site-header > label[for="single-pane-toggle"] { 
+        font-size: 0.8rem; 
+        margin-right: 0.5rem;
+      }
+      /* Original style for label if it were still in header-control-group */
       .header-control-group label { font-size: 0.8rem; margin-right: 0.5rem;}
       .github-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
       [id] { scroll-margin-top: calc(var(--header-height) + 10px); }
@@ -516,10 +537,10 @@ async function generateSite() {
 <body>
   <header class="site-header sticky">
     <button class="menu-toggle" id="menu-toggle-btn" aria-expanded="false" aria-controls="main-menubar">Menu</button>
+    <input type="checkbox" id="single-pane-toggle" name="singlePane">
+    <label for="single-pane-toggle">Single Pane</label>
     <h1 class="site-title">Health Tech RFI Response</h1>
     <div class="header-control-group">
-        <input type="checkbox" id="single-pane-toggle" name="singlePane">
-        <label for="single-pane-toggle">Single Pane</label>
         <a class="github-btn" href="https://github.com/jmandel/cms-rfi-collab" target="_blank" rel="noopener">Contribute on GitHub</a>
     </div>
   </header>
@@ -605,7 +626,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (singlePaneToggle) {
         const urlParams = new URLSearchParams(window.location.search);
-        const initialSinglePane = urlParams.get('singlePane') === 'true';
+        let initialSinglePane;
+
+        if (window.innerWidth < DESKTOP_BREAKPOINT) { // Mobile view
+            if (urlParams.has('singlePane')) { // Check if the parameter exists
+                initialSinglePane = urlParams.get('singlePane') === 'true'; // Respect explicit param
+            } else {
+                initialSinglePane = true; // Default to true on mobile if param is absent
+            }
+        } else { // Desktop view
+            initialSinglePane = urlParams.get('singlePane') === 'true'; // Default to false unless param is true
+        }
+        
         applySinglePaneMode(initialSinglePane); // Applies class and sets checkbox
 
         singlePaneToggle.addEventListener('change', (event) => {
