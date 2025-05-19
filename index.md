@@ -257,32 +257,30 @@ Effective, scalable interoperability across a diverse national landscape require
 ## B. Patients and Caregivers
 
 ### PC-2. Do you have easy access to your own and all your loved ones' health information in one location (for example, in a single patient portal or another software system)?
-**a. If so, what are some examples of benefits it has provided?**
-**b. If not, in what contexts or for what workflows would it be most valuable to use one portal or system to access all such health information?**
-**c. Were there particular data types, such as x-rays or specific test results, that were unavailable? What are the obstacles to accessing your own or your loved ones' complete health information electronically and using it for managing health conditions or finding the best care (for example, limitations in functionality, user friendliness, or access to basic technology infrastructure)?**
 
-Easy access to complete health information in one location is currently the exception, not the rule, for most patients and caregivers. Achieving this goal is fundamental and is directly supported by several of our guiding principles and recommendations:
+Easy access to complete health information in one location is currently the exception, not the rule, for most patients and caregivers. Obstacles include:
+1.  **Limited Scope of Current APIs:** Often restricted to USCDI, excluding much of the complete EHI.
+2.  **Lack of API Access to Full EHI:** EHI exports are often manual and not computable.
+3.  **Difficult Image Access:** Images are rarely available via patient-facing APIs.
+4.  **Fragmented Identity and Portal Logins:** Managing numerous accounts is a burden. Our recommendation for [Ensure Patient Access to Remote, High-Assurance Portal Account Provisioning](#req_coordinated_remote_provisioning_access) and broader adoption of federated identity could alleviate this.
+
+
+Achieving comprehensive access is fundamental and is directly supported by several of our guiding principles and recommendations:
+
 
 #### Guiding Principles:
 *   [Patient Primacy and Empowerment](#principle_patient_primacy): Individuals must have easy access to their complete health data.
 *   [Comprehensive and Performant Data Access](#principle_comprehensive_performant_data_access): Access must be to complete Electronic Health Information (EHI), not just a limited subset.
 
-#### Key Technology Policy Recommendations for enabling comprehensive access:
+#### Key Recommendations for enabling comprehensive access:
 *   [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat): This is crucial for patients to obtain *all* their EHI via API, including notes and images, enabling truly comprehensive personal health records.
 *   [Mandate Self-Service Electronic EHI Request Functionality in Certified Health IT](#req_self_service_ehi_request): Provides a baseline electronic, self-service method for patients to request their full EHI.
 *   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access): Addresses the common unavailability of diagnostic images via patient-facing APIs.
 *   [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development): Ensures an expanding common data foundation of standardized elements.
 *   [Establish a "TEFCA Patient-Developer Credential" for Comprehensive, Direct Data Access](#req_tefca_patient_developer_credential): Empowers individuals to use tools to aggregate their own data from various sources.
 
-#### Obstacles (PC-2c):
-Obstacles include:
-1.  **Limited Scope of Current APIs:** Often restricted to USCDI, excluding much of the complete EHI.
-2.  **Lack of API Access to Full EHI:** EHI exports are often manual and not computable.
-3.  **Difficult Image Access:** Images are rarely available via patient-facing APIs.
-4.  **Fragmented Identity and Portal Logins:** Managing numerous accounts is a burden. Our recommendation for [Ensure Patient Access to Remote, High-Assurance Portal Account Provisioning](#req_coordinated_remote_provisioning_access) and broader adoption of federated identity could alleviate this.
 
 ### PC-5. What can CMS and its partners do to encourage patient and caregiver interest in these digital health products?
-**a. What role, if any, should CMS have in reviewing or approving digital health products on the basis of their efficacy, quality or impact or both on health outcomes (not approving in the sense of a coverage determination)? What criteria should be used if there is a review process? What technology solutions, policy changes, or program design changes can increase patient and caregiver adoption of digital health products (for example, enhancements to data access, reimbursement adjustments, or new beneficiary communications)?**
 
 CMS's primary role should be to ensure foundational data access and protect patient rights, rather than reviewing or approving most digital health products, especially those individuals choose or develop for their own use. Our approach is guided by:
 
@@ -302,7 +300,6 @@ CMS's primary role should be to ensure foundational data access and protect pati
 CMS should avoid becoming an app "approver" for general health tools, which could stifle innovation. Focus on open, secure, comprehensive data pipes, allowing the market and patients to determine value.
 
 ### PC-8. In your experience, what health data is readily available and valuable to patients or their caregivers or both?
-**a. What data is valuable, but hard for patients and caregivers, or app developers and other technical vendors, to access for appropriate and valuable use (for example, claims data, clinical data, encounter notes, operative reports, appointment schedules, prices)?**
 
 While basic structured data (USCDI) is increasingly available, much of the richest data remains difficult to access programmatically.
 
