@@ -301,8 +301,6 @@ async function generateSite() {
     .github-btn { padding: 0.4rem 0.8rem; background: var(--primary-blue); color: #fff; border-radius: 0.25rem; font-weight: 500; text-decoration: none; font-size: 0.875rem; white-space: nowrap; }
     .github-btn:hover { background: #0056b3; }
 
-    /* Removed .toc-mobile-only styles */
-
     .app-layout {
       display: grid;
       grid-template-columns: var(--menubar-width-collapsed) 1fr; /* Menubar (closed) and content */
@@ -383,22 +381,21 @@ async function generateSite() {
 
     .content-section > h2 { 
       margin-top: 0; 
-      padding-bottom: 0.5rem; 
-      border-bottom: 1px solid var(--card-border-top); 
-      font-size: 1.75rem; 
       color: #111827; 
-      margin-bottom: 1rem; 
+      // margin: 0px;
+      // margin-bottom: 105px;
+      border-bottom: 5px solid slateblue;
+      padding: 0px;
+      // padding-bottom: 5px;
     }
+
 
     .sticky-section-header {
       position: sticky;
-      top: -1px; /* Small negative top to ensure border is above scrolled content */
+      top: -0px;
       background-color: var(--bg-pane-left); /* Default, override for right pane */
-      padding-top: 1rem; /* Add some padding above the text */
-      padding-bottom: 0.75rem; /* Keep existing padding-bottom logic or adjust */
-      margin-bottom: 1rem; /* Keep existing margin or adjust */
+      font-size :1rem;
       z-index: 10;
-      /* border-bottom: 1px solid var(--card-border-top); /* Keep border */
     }
     .right-pane-content-wrapper .sticky-section-header {
         background-color: var(--bg-pane-right);
@@ -536,6 +533,10 @@ async function generateSite() {
         font-size: 1rem; /* Reduced font size for mobile */
         padding-top: 0.2rem; 
         padding-bottom: 0.2rem;
+              border: 0px;
+              width: 100%;
+              border-left: 5px solid slateblue;
+              padding-left: 5px;
       }
     }
   </style>
@@ -637,11 +638,42 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const containerRect = scrollContainer.getBoundingClientRect();
         const targetRect = targetElement.getBoundingClientRect();
-
-        // Calculate the target's top position relative to the scroll container's content area
-        const scrollTopTo = targetRect.top - containerRect.top + scrollContainer.scrollTop;
         
-        return scrollTopTo - 15; // 15px offset from top of pane
+        // This is the scrollContainer.scrollTop value that would make the targetElement's top
+        // align with the scrollContainer's top.
+        const scrollTopToAlignTop = targetRect.top - containerRect.top + scrollContainer.scrollTop;
+
+        let offsetDueToStickyHeader = 0;
+
+        // Check if the targetElement is one of the main H2-level section containers
+        const isTargetMajorSection = targetElement.matches('#response-letter-heading, #guiding-principles-heading, #technology-policy-recommendations-heading');
+
+        if (!isTargetMajorSection) {
+            // Target is an item within a major section (e.g., an article, a recommendation category)
+            const contentSection = targetElement.closest('.content-section');
+            if (contentSection) {
+                const stickyHeader = contentSection.querySelector('.sticky-section-header');
+                // Ensure the stickyHeader is actually sticky and is a direct child of the contentSection's structure
+                if (stickyHeader && getComputedStyle(stickyHeader).position === 'sticky' && stickyHeader.parentElement === contentSection) {
+                    offsetDueToStickyHeader = stickyHeader.offsetHeight;
+                }
+            }
+        }
+        // If isTargetMajorSection, offsetDueToStickyHeader remains 0.
+        // This means we want the top of the major section (which includes its own sticky H2)
+        // to be positioned relative to the scroll pane's top, not relative to its own H2.
+
+        const desiredPadding = 15; // Desired space below the sticky header (if applicable) or below pane top.
+        
+        let finalScrollOffset = desiredPadding; 
+        if (!isTargetMajorSection && offsetDueToStickyHeader > 0) {
+            // For items within a section, position them below that section's sticky header.
+            finalScrollOffset = offsetDueToStickyHeader + desiredPadding;
+        }
+        
+        // scrollTopToAlignTop makes target's top align with container's top (0px from container top).
+        // Scrolling to 'scrollTopToAlignTop - X' makes target's top appear Xpx below container's top.
+        return scrollTopToAlignTop - finalScrollOffset;
     }
 
 
