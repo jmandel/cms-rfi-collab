@@ -311,20 +311,16 @@ While basic structured data (USCDI) is increasingly available, much of the riche
 *   Medicare claims data via Blue Button 2.0.
 
 #### Valuable but Hard to Access (PC-8a):
-*   **Complete Clinical Notes:** Essential for the "story" of care. Solved by [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat).
-*   **Diagnostic Quality Medical Images:** Critical but rarely API-accessible. Solved by [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access).
-*   **Full Lab Narratives and Trends:** Often only discrete results are available. Addressed by [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat).
-*   **Appointment Schedules & Administrative Data:** Programmatic access is rare. Enhanced certification under [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert) could address this.
-*   **Detailed Price Information (Patient-Specific).**
-*   **Patient-Reported Outcomes and Preferences.**
+Making the following valuable data types more accessible programmatically is crucial. Many of these challenges can be significantly addressed by two overarching recommendations: ensuring comprehensive data availability via [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat) and by expanding standardized data elements through [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development). Specific data types include:
 
-Making these harder-to-access data types available through robust APIs, primarily via [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat), is key.
+*   **Diagnostic quality medical images:** Critical but rarely API-accessible (though imaging reports may sometimes be available, the images themselves are harder to obtain programmatically). This is primarily solved by [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access), and also supported by the EHI export.
+*   **Full flowsheet data:** Comprehensive view of patient status and interventions. Addressed by EHI export and potentially USCDI expansion.
+*   **Detailed/granular lab results (e.g., cancer, microbiology):** Beyond simple numerics, including narratives, structured reports, and interpretations.
+*   **Schedules/appointment information:** Programmatic access is rare.
+*   **Patient-Reported Outcomes (PROs).** Addressed by EHI export and USCDI expansion.
+*   **Price information (patient-specific cost estimates).** Addressing this likely takes new functional requirements on providers and certified EHR technology.
 
 ### PC-10. How is the Trusted Exchange Framework and Common AgreementTM (TEFCATM) currently helping to advance patient access to health information in the real world?
-**a. Please provide specific examples.**
-**b. What changes would you suggest?**
-**c. What use cases could have a significant impact if implemented through TEFCA?**
-**g. Are there adequate alternatives outside of TEFCA for achieving widespread patient access to their health information?**
 
 TEFCA's impact on *individual patient-initiated access* is still nascent. Its potential requires significant evolution towards patient empowerment.
 
