@@ -245,13 +245,26 @@ async function generateSite() {
   mobileTocHtml += '</ul>';
 
   // Desktop TOC is now the main menubar content
-  let desktopTocHtml = '<nav class="desktop-toc"><h4>Quick Navigation</h4><ul>'; // Removed sticky-within-pane
+  let desktopTocHtml = '<nav class="desktop-toc"><h4>Quick Navigation</h4><ul>';
+  
+  // 1. Response Letter (RFI Questions) - typically in the left pane
+  desktopTocHtml += `<li><a href="#response-letter-heading">Response Letter</a></li>`;
+  desktopTocHtml += '<ul class="nested">';
+  for (const q of rfiQuestionsData) {
+    // Using similar truncation as mobile, adjust if needed for desktop menubar width
+    desktopTocHtml += `<li><a href="#${q.id}">${q.text.length > 50 ? q.text.substring(0,47)+'...' : q.text }</a></li>`;
+  }
+  desktopTocHtml += '</ul>';
+
+  // 2. Guiding Principles - typically in the right pane
   desktopTocHtml += `<li><a href="#guiding-principles-heading">Guiding Principles</a></li>`;
   desktopTocHtml += '<ul class="nested">';
   for (const p of principlesData) {
     desktopTocHtml += `<li><a href="#${p.id}">${p.text}</a></li>`;
   }
   desktopTocHtml += '</ul>';
+
+  // 3. Technology Policy Recommendations - typically in the right pane
   desktopTocHtml += `<li><a href="#technology-policy-recommendations-heading">Technology Policy Recommendations</a></li>`;
   desktopTocHtml += '<ul class="nested">';
   for (const cat of recommendationsCategoryData) {
@@ -266,6 +279,9 @@ async function generateSite() {
   }
   desktopTocHtml += '</ul>';
   desktopTocHtml += '</ul></nav>';
+
+  // Pre-construct the problematic JavaScript string for rootMargin
+  const jsObserverRootMargin = '`-${headerHeight + 10}px 0px -75% 0px`';
 
   const finalHtml = `
 <!DOCTYPE html>
@@ -645,7 +661,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper');
     const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host');
     const desktopTocElement = mainMenubar ? mainMenubar.querySelector('.desktop-toc') : null;
-    let tocIntersectionObserver = null;
+    
+    let tocRightPaneObserver = null;
+    let tocLeftPaneObserver = null;
+    let lastActiveTocId = null; // Used by observers and click handlers to track active TOC item
 
     // --- Helper Functions ---
 
@@ -731,6 +750,7 @@ document.addEventListener('DOMContentLoaded', () => {
                  console.warn("rightPaneScroller not found for a right-pane target. Cannot scroll pane.");
                  if (targetId) window.location.hash = targetId; 
                  updateDesktopTocActiveState(targetId);
+                 lastActiveTocId = targetId;
                  return; 
             }
         } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
@@ -749,7 +769,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         highlightTarget(targetElement);
         updateDesktopTocActiveState(targetId);
-        if (targetId) window.location.hash = targetId;
+        if (targetId) {
+            window.location.hash = targetId;
+            lastActiveTocId = targetId; // Update lastActiveTocId
+        }
     }
 
     function scrollToTargetInSinglePaneOrMobile(targetElement, hash, isSinglePane, isDesktop) {
@@ -757,6 +780,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // scroll-margin-top CSS handles offset.
         if (isSinglePane && isDesktop) { // Desktop single-pane specific update
             updateDesktopTocActiveState(hash);
+            lastActiveTocId = hash; // Update lastActiveTocId
         }
     }
 
@@ -765,10 +789,12 @@ document.addEventListener('DOMContentLoaded', () => {
             const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
             rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
             updateDesktopTocActiveState(hash);
+            lastActiveTocId = hash; // Update lastActiveTocId
         } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
             const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
             leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-            // No TOC update for left-pane targets usually.
+            updateDesktopTocActiveState(hash); // RFI questions are in TOC, so update
+            lastActiveTocId = hash; // Update lastActiveTocId
         } else { 
             targetElement.scrollIntoView({ behavior: 'instant', block: 'start'}); // Fallback
         }
@@ -799,14 +825,16 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function setupDesktopTocInteractions() { 
-        if (tocIntersectionObserver) {
-            tocIntersectionObserver.disconnect();
-            tocIntersectionObserver = null;
-        }
+        if (tocRightPaneObserver) tocRightPaneObserver.disconnect();
+        if (tocLeftPaneObserver) tocLeftPaneObserver.disconnect();
+        tocRightPaneObserver = null;
+        tocLeftPaneObserver = null;
+        // lastActiveTocId = null; // Optionally reset if this function can be called multiple times in a way that requires it
+
         if (!desktopTocElement) return;
 
         desktopTocElement.querySelectorAll('a').forEach(link => {
-            const newLink = link.cloneNode(true); // Prevent multiple listeners on re-setup
+            const newLink = link.cloneNode(true); 
             link.parentNode.replaceChild(newLink, link);
         });
         
@@ -840,50 +868,61 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (!targetElement) {
                     const isDesktopTwoPane = !bodyElement.classList.contains('single-pane-mode');
                     if (isDesktopTwoPane && targetId) { 
-                        window.location.hash = targetId;
+                        window.location.hash = targetId; // Allow hash to change, might trigger listener
                     }
                     return;
                 }
 
                 if (bodyElement.classList.contains('single-pane-mode')) {
                     updateDesktopTocActiveState(targetId);
+                    lastActiveTocId = targetId; // Update for single-pane desktop clicks
                     // Allow default hash navigation for single-pane desktop.
-                } else {
-                    handleTwoPaneDesktopTocScroll(event, targetElement, targetId);
+                } else { // Two-pane desktop
+                    handleTwoPaneDesktopTocScroll(event, targetElement, targetId); // This will update lastActiveTocId
                 }
             });
         });
 
-        // IntersectionObserver for two-pane desktop
-        if (!bodyElement.classList.contains('single-pane-mode')) {
+        // IntersectionObserver setup for two-pane desktop
+        if (!bodyElement.classList.contains('single-pane-mode') && window.innerWidth >= DESKTOP_BREAKPOINT) {
+            const observerCallback = entries => {
+                let bestVisibleEntry = null;
+                entries.forEach(entry => {
+                    if (entry.isIntersecting && (!bestVisibleEntry || entry.boundingClientRect.top < bestVisibleEntry.boundingClientRect.top)) {
+                        bestVisibleEntry = entry;
+                    }
+                });
+                if (bestVisibleEntry) {
+                    const id = bestVisibleEntry.target.getAttribute('id');
+                    if (id && id !== lastActiveTocId) {
+                        updateDesktopTocActiveState(id);
+                        lastActiveTocId = id;
+                    }
+                }
+            };
+
+            const observerOptions = (rootElement) => ({
+                root: rootElement,
+                rootMargin: ${jsObserverRootMargin},
+                threshold: 0.01
+            });
+
+            // Observer for Right Pane
             if (rightPaneScroller && rightPaneObservedContent) {
-                 const contentHeadings = Array.from(rightPaneObservedContent.querySelectorAll('h2[id], h3[id], h4[id], article[id]'));
-                 if (contentHeadings.length > 0) {
-                    let lastVisibleTocLink = null; 
-                    tocIntersectionObserver = new IntersectionObserver(entries => {
-                        let bestVisibleEntry = null;
-                        entries.forEach(entry => {
-                            if (entry.isIntersecting && (!bestVisibleEntry || entry.boundingClientRect.top < bestVisibleEntry.boundingClientRect.top)) {
-                                bestVisibleEntry = entry;
-                            }
-                        });
-                        if (bestVisibleEntry) {
-                            const id = bestVisibleEntry.target.getAttribute('id');
-                            if (id) { // Ensure id is not null
-                                const tocLink = desktopTocElement.querySelector(\`a[href="#\${id}"]\`);
-                                if (tocLink && tocLink !== lastVisibleTocLink) {
-                                    updateDesktopTocActiveState(id); 
-                                    lastVisibleTocLink = tocLink;
-                                }
-                            }
-                        }
-                    }, { 
-                        root: rightPaneScroller, 
-                        rootMargin: \`-\${headerHeight + 10}px 0px -75% 0px\`, 
-                        threshold: 0.01 
-                    });
-                    contentHeadings.forEach(heading => tocIntersectionObserver.observe(heading));
+                 const rightHeadings = Array.from(rightPaneObservedContent.querySelectorAll('h2[id], h3[id], h4[id], article[id]'));
+                 if (rightHeadings.length > 0) {
+                    tocRightPaneObserver = new IntersectionObserver(observerCallback, observerOptions(rightPaneScroller));
+                    rightHeadings.forEach(heading => tocRightPaneObserver.observe(heading));
                  }
+            }
+
+            // Observer for Left Pane (RFI Letter)
+            if (leftPaneHost) {
+                const leftHeadings = Array.from(leftPaneHost.querySelectorAll('h2[id], article[id].rfi-question')); // Observe section header and RFI question articles
+                if (leftHeadings.length > 0) {
+                    tocLeftPaneObserver = new IntersectionObserver(observerCallback, observerOptions(leftPaneHost));
+                    leftHeadings.forEach(heading => tocLeftPaneObserver.observe(heading));
+                }
             }
         }
     }
