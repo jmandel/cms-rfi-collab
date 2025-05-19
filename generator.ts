@@ -254,7 +254,7 @@ async function generateSite() {
   <title>Health Technology Ecosystem: RFI Responses</title>
   <style>
     :root {
-      --header-height: 55px;
+      --header-height: 55px; /* Will be dynamically updated by JS */
       --menubar-width-collapsed: 0px; /* Or a small width if you want a sliver */
       --menubar-width-expanded: 420px; /* Increased by 50% from 280px */
       --primary-blue: #007bff;
@@ -296,8 +296,12 @@ async function generateSite() {
       align-items: center;
       justify-content: space-between;
     }
-    .site-header .site-title { font-size: 1.1rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .site-header .menu-toggle { display: none; background: none; border: 1px solid var(--primary-blue); color: var(--primary-blue); padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; border-radius: 0.25rem; }
+    .site-header .site-title { font-size: 1.1rem; font-weight: 600; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; flex-grow: 1; }
+    .site-header .menu-toggle { display: none; background: none; border: 1px solid var(--primary-blue); color: var(--primary-blue); padding: 0.375rem 0.75rem; font-size: 1rem; cursor: pointer; border-radius: 0.25rem; margin-right: 0.5rem; }
+    .header-control-group { display: flex; align-items: center; margin-left: auto; /* Pushes it to the right */ }
+    .header-control-group label { margin-right: 0.75rem; font-size: 0.875rem; white-space: nowrap; cursor: pointer; user-select: none; color: var(--text-light); }
+    .header-control-group input[type="checkbox"] { margin-right: 0.25rem; cursor: pointer; vertical-align: middle;}
+
     .github-btn { padding: 0.4rem 0.8rem; background: var(--primary-blue); color: #fff; border-radius: 0.25rem; font-weight: 500; text-decoration: none; font-size: 0.875rem; white-space: nowrap; }
     .github-btn:hover { background: #0056b3; }
 
@@ -331,76 +335,60 @@ async function generateSite() {
     .app-layout:not(.menubar-open) .menubar {
         padding-left: 0;
         padding-right: 0;
-        /* Content inside menubar will be hidden by overflow:hidden or specific rules */
     }
     .app-layout:not(.menubar-open) .menubar > * {
         display: none; /* Hide children when collapsed */
     }
 
-
     .content-wrapper {
       grid-area: content;
       display: grid; 
-      overflow: hidden; /* Prevent double scrollbars, individual panes will scroll */
+      overflow: hidden; /* Default: Prevent double scrollbars, individual panes will scroll */
       height: 100%;
-      /* Grid definition moved to media queries */
     }
         
     .left-pane-content { 
       grid-area: rfi; 
       background-color: var(--bg-pane-left);
-      overflow-y: auto;
-      height: 100%; /* Fill available space in its grid area */
+      overflow-y: auto; /* Default: scrolls itself */
+      height: 100%; 
     }
     .right-pane-content-wrapper { 
       grid-area: principles; 
       background-color: var(--bg-pane-right); 
-      overflow-y: auto; /* This wrapper will scroll if its content (main) overflows */
-      height: 100%; /* Fill available space in its grid area */
+      overflow-y: auto; /* Default: scrolls itself */
+      height: 100%;
     }
     
-    /* .actual-content-for-right-pane is the <main> tag */
     .actual-content-for-right-pane {
-      color: var(--text-light); /* Different font color for right pane */
-      /* No specific height/overflow here, let it be natural height. Parent .right-pane-content-wrapper scrolls. */
+      color: var(--text-light);
     }
 
     .left-pane-content > section, 
-    .actual-content-for-right-pane > section { padding: 1.5rem; } /* Consistent padding for sections within panes */
+    .actual-content-for-right-pane > section { padding: 1.5rem; } 
     
-    /* Adjust padding for sections if their first child is a sticky header */
      .left-pane-content > section:has(> .sticky-section-header:first-child),
      .actual-content-for-right-pane > section:has(> .sticky-section-header:first-child) {
         padding-top: 0; 
     }
-    .left-pane-content > section > .sticky-section-header:first-child,
-    .actual-content-for-right-pane > section > .sticky-section-header:first-child {
-         /* No top margin if it's the very first element and sticky */
-    }
-
 
     .content-section > h2 { 
       margin-top: 0; 
       color: #111827; 
-      // margin: 0px;
-      // margin-bottom: 105px;
       border-bottom: 5px solid slateblue;
       padding: 0px;
-      // padding-bottom: 5px;
     }
-
 
     .sticky-section-header {
       position: sticky;
       top: -0px;
-      background-color: var(--bg-pane-left); /* Default, override for right pane */
+      background-color: var(--bg-pane-left); 
       font-size :1rem;
       z-index: 10;
     }
     .right-pane-content-wrapper .sticky-section-header {
         background-color: var(--bg-pane-right);
     }
-
 
     .recommendation-category > .category-title { font-size: 1.4rem; color: #0056b3; margin-top: 1.5rem; margin-bottom:1rem; padding-bottom:0.5rem; border-bottom: 2px solid #bfdbfe; }
     .recommendation-category:first-child > .category-title { margin-top:0; }
@@ -418,41 +406,16 @@ async function generateSite() {
     pre { background-color: #e9ecef; padding: 1rem; border-radius: 0.25rem; overflow-x: auto;}
     pre code { padding:0; background-color: transparent; font-size: inherit; }
 
-    .section-title {
-      position: relative; /* For potential positioning of anchor, or just as a hook */
-    }
-    .anchor-link {
-      font-size: 0.8em; /* Smaller than heading */
-      font-weight: normal; /* Ensure it's not bold if heading is */
-      text-decoration: none;
-      color: var(--primary-blue);
-      opacity: 0.25; /* Subtle by default */
-      transition: opacity 0.2s ease-in-out;
-      margin-left: 0.3em;
-      vertical-align: middle; /* Align with text better */
-    }
-    .section-title:hover .anchor-link,
-    .anchor-link:hover, /* Make link itself hoverable */
-    .anchor-link:focus {
-      opacity: 1; /* Visible on hover/focus */
-      text-decoration: none; /* Keep no underline on hover for icon */
-    }
+    .section-title { position: relative; }
+    .anchor-link { font-size: 0.8em; font-weight: normal; text-decoration: none; color: var(--primary-blue); opacity: 0.25; transition: opacity 0.2s ease-in-out; margin-left: 0.3em; vertical-align: middle; }
+    .section-title:hover .anchor-link, .anchor-link:hover, .anchor-link:focus { opacity: 1; text-decoration: none; }
 
     .highlighted-item-temp { animation: highlight-animation 2.5s ease-out; }
     @keyframes highlight-animation { 0% { background-color: var(--highlight-bg); } 80% { background-color: var(--highlight-bg); } 100% { background-color: transparent; } }
     
-    [id] { scroll-margin-top: calc(var(--header-height) + 15px); } /* Keep this for in-page links */
+    [id] { scroll-margin-top: calc(var(--header-height) + 15px); } 
 
-    /* Styles for .desktop-toc (now inside .menubar) */
-    .desktop-toc { 
-      /* display: none; by default, shown by .menubar logic */
-      width: 100%; /* Fill menubar width */
-      font-size: 0.9rem; /* Slightly larger for better readability in menubar */
-      height: auto; /* Allow it to take natural height within menubar */
-      overflow-y: visible; /* Menubar handles scrolling */
-      padding-right: 0; /* Padding is on menubar itself */
-      /* remove sticky-within-pane if it was here, menubar handles its position */
-    }
+    .desktop-toc { width: 100%; font-size: 0.9rem; height: auto; overflow-y: visible; padding-right: 0; }
     .desktop-toc h4 { margin-top: 0; font-size: 1.1em; color: var(--text-dark); margin-bottom: 0.75rem; }
     .desktop-toc ul { list-style: none; padding-left: 0; margin-bottom: 0.75rem; }
     .desktop-toc ul.nested { padding-left: 0.75rem; }
@@ -461,82 +424,91 @@ async function generateSite() {
     .desktop-toc li a:hover { text-decoration: underline; border-left-color: #0056b3; }
     .desktop-toc li a.active-toc-item { font-weight: 600; color: #0056b3; border-left-color: var(--primary-blue); }
 
-    @media (min-width: 1024px) { /* Desktop layout */
-      .site-header .menu-toggle { display: block; } /* Keep toggle visible for desktop too */
-      /* .toc-mobile-only { display: none !important; } /* Removed */
-      
-      .app-layout.menubar-open .content-wrapper {
-        /* Optional: add a margin or padding if needed when menu is open, though grid handles push */
-      }
-
-      .content-wrapper {
-        grid-template-columns: 45% 1fr; /* RFI letter (left), Principles/Recs (right) */
-        grid-template-rows: 100%; /* Single row, full height */
-        grid-template-areas:
-          "rfi principles";
-        height: 100%; /* Ensure it fills the app-layout area */
-      }
-      .left-pane-content { 
-        border-right: 1px solid var(--border-color); 
-        height: 100%; 
-        overflow-y: auto;
-      }
-      .right-pane-content-wrapper {
-        /* Desktop: right-pane-content-wrapper itself scrolls if its main content is too tall */
-         overflow-y: auto; 
-      }
-      .actual-content-for-right-pane { 
-         /* Desktop: actual content takes natural height, parent scrolls */
-         height: auto; 
-         overflow-y: visible; 
-      }
-      .left-pane-content {
-        overflow-y: auto; /* Ensure left pane scrolls independently */
-      }
+    /* Single Pane Mode Styles */
+    body.single-pane-mode .content-wrapper {
+        display: flex;
+        flex-direction: column;
+        overflow-y: auto; /* Main scrollbar here */
+        grid-template-columns: 1fr !important; /* Override desktop grid */
+        grid-template-areas: none !important; /* Override desktop grid */
+    }
+    body.single-pane-mode .left-pane-content,
+    body.single-pane-mode .right-pane-content-wrapper {
+        width: 100%;
+        height: auto !important; /* Override fixed heights from mobile or desktop */
+        overflow-y: visible; /* Content flows, parent scrolls */
+        border-right: none !important; /* Remove inter-pane border */
+        flex-basis: auto;
+        flex-grow: 0;
+        flex-shrink: 0;
+    }
+    body.single-pane-mode .left-pane-content {
+        border-bottom: 1px solid var(--border-color); /* Separate stacked sections */
+    }
+    body.single-pane-mode .right-pane-content-wrapper {
+        border-bottom: none;
+    }
+     body.single-pane-mode .actual-content-for-right-pane {
+        height: auto !important;
+        overflow-y: visible !important;
     }
 
-    @media (max-width: 1023px) { /* Mobile/Tablet layout */
+
+    @media (min-width: 1024px) { /* Desktop layout (two-pane default) */
       .site-header .menu-toggle { display: block; }
-      .site-header .site-title { font-size: 1rem; max-width: calc(100% - 150px); }
+      
+      body:not(.single-pane-mode) .content-wrapper {
+        grid-template-columns: 45% 1fr; 
+        grid-template-rows: 100%; 
+        grid-template-areas: "rfi principles";
+      }
+      body:not(.single-pane-mode) .left-pane-content { 
+        border-right: 1px solid var(--border-color); 
+      }
+      /* Other two-pane specific desktop styles remain as they were */
+    }
+
+    @media (max-width: 1023px) { /* Mobile/Tablet layout (already somewhat single-flow) */
+      .site-header .menu-toggle { display: block; }
+      .site-header .site-title { font-size: 1rem; max-width: calc(100% - 180px); /* Adjusted for more controls */ }
+      .header-control-group label { font-size: 0.8rem; margin-right: 0.5rem;}
       .github-btn { font-size: 0.8rem; padding: 0.3rem 0.6rem; }
       [id] { scroll-margin-top: calc(var(--header-height) + 10px); }
 
       .app-layout.menubar-open {
         grid-template-columns: var(--menubar-width-expanded-mobile) 1fr;
       }
-      .menubar {
-         /* On mobile, when open, it uses menubar-width-expanded-mobile */
-      }
-      .content-wrapper {
-        display: flex; /* Use flex for mobile stacking */
+      
+      body:not(.single-pane-mode) .content-wrapper { /* Default mobile is two-rows flex */
+        display: flex; 
         flex-direction: column;
-        overflow: hidden; /* content-wrapper itself should not scroll */
-        height: 100%; /* Ensure it fills available space */
+        overflow: hidden; 
+        height: 100%; 
       }
-      .left-pane-content { 
+      body:not(.single-pane-mode) .left-pane-content { 
         border-right: none; 
         border-bottom: 1px solid var(--border-color);
-        height: 50%; /* Takes 50% of parent height */
-        overflow-y: auto; /* This pane scrolls if its content is too tall */
-        flex-shrink: 0; /* Prevent shrinking if content below is large */
+        height: 50%; 
+        overflow-y: auto; 
+        flex-shrink: 0; 
       }
-      .right-pane-content-wrapper {
-        overflow-y: auto; /* This pane scrolls */
-        flex-grow: 1; /* Takes remaining space */
-        height: 0; /* Fix for flex item with overflow:auto to scroll correctly */
+      body:not(.single-pane-mode) .right-pane-content-wrapper {
+        overflow-y: auto; 
+        flex-grow: 1; 
+        height: 0; 
       }
-      .actual-content-for-right-pane {
-        height: auto; /* Content determines height within the scrollable wrapper */
-         /* overflow-y: visible; /* Not needed, parent scrolls */
+      body:not(.single-pane-mode) .actual-content-for-right-pane {
+        height: auto; 
       }
+
       .content-section > h2.sticky-section-header {
-        font-size: 1rem; /* Reduced font size for mobile */
+        font-size: 1rem; 
         padding-top: 0.2rem; 
         padding-bottom: 0.2rem;
-              border: 0px;
-              width: 100%;
-              border-left: 5px solid slateblue;
-              padding-left: 5px;
+        border: 0px;
+        width: 100%;
+        border-left: 5px solid slateblue;
+        padding-left: 5px;
       }
     }
   </style>
@@ -545,10 +517,13 @@ async function generateSite() {
   <header class="site-header sticky">
     <button class="menu-toggle" id="menu-toggle-btn" aria-expanded="false" aria-controls="main-menubar">Menu</button>
     <h1 class="site-title">Health Tech RFI Response</h1>
-    <a class="github-btn" href="https://github.com/jmandel/cms-rfi-collab" target="_blank" rel="noopener">Contribute on GitHub</a>
+    <div class="header-control-group">
+        <input type="checkbox" id="single-pane-toggle" name="singlePane">
+        <label for="single-pane-toggle">Single Pane</label>
+        <a class="github-btn" href="https://github.com/jmandel/cms-rfi-collab" target="_blank" rel="noopener">Contribute on GitHub</a>
+    </div>
   </header>
 
-  <!-- Removed mobileTocHtml placeholder -->
   <div class="app-layout">
     <aside id="main-menubar" class="menubar">
       ${desktopTocHtml}
@@ -579,48 +554,87 @@ async function generateSite() {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    if ('scrollRestoration' in history) {
+        history.scrollRestoration = 'manual';
+    }
     const DESKTOP_BREAKPOINT = 1024;
+    const bodyElement = document.body;
     const appLayout = document.querySelector('.app-layout');
     const headerElement = document.querySelector('.site-header');
-    const headerHeight = headerElement ? headerElement.offsetHeight : 55;
+    let headerHeight = headerElement ? headerElement.offsetHeight : 55; // Made let
     
-    document.documentElement.style.setProperty('--header-height', \`\${headerHeight}px\`);
-
+    function updateHeaderHeightVar() {
+        headerHeight = headerElement ? headerElement.offsetHeight : 55;
+        document.documentElement.style.setProperty('--header-height', \`\${headerHeight}px\`);
+    }
+    updateHeaderHeightVar(); // Initial call
 
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
     const mainMenubar = document.getElementById('main-menubar');
+    const singlePaneToggle = document.getElementById('single-pane-toggle');
     
-    const leftPaneHost = document.getElementById('rfi-letter-pane-host'); // Scrolls itself
-    const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper'); // This div scrolls on desktop
-    const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host'); // Content within the scroller, root for observer
+    const leftPaneHost = document.getElementById('rfi-letter-pane-host'); 
+    const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper'); 
+    const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host'); 
     const desktopTocElement = mainMenubar.querySelector('.desktop-toc');
+    let tocIntersectionObserver = null;
+
+
+    function applySinglePaneMode(isSinglePane) {
+        if (isSinglePane) {
+            bodyElement.classList.add('single-pane-mode');
+        } else {
+            bodyElement.classList.remove('single-pane-mode');
+        }
+        if (singlePaneToggle) {
+            singlePaneToggle.checked = isSinglePane;
+        }
+        // Re-evaluate TOC interactions since layout changed
+        setupDesktopTocInteractions(); 
+    }
+
+    function updateURLForSinglePane(isSinglePane) {
+        const url = new URL(window.location.href);
+        if (isSinglePane) {
+            url.searchParams.set('singlePane', 'true');
+        } else {
+            url.searchParams.delete('singlePane');
+        }
+        history.replaceState({}, '', url.toString());
+    }
+
+    if (singlePaneToggle) {
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialSinglePane = urlParams.get('singlePane') === 'true';
+        applySinglePaneMode(initialSinglePane); // Applies class and sets checkbox
+
+        singlePaneToggle.addEventListener('change', (event) => {
+            const isChecked = event.target.checked;
+            applySinglePaneMode(isChecked);
+            updateURLForSinglePane(isChecked);
+        });
+    }
+
 
     if (menuToggleBtn && mainMenubar && appLayout) {
         menuToggleBtn.addEventListener('click', () => {
             const isExpanded = menuToggleBtn.getAttribute('aria-expanded') === 'true';
             menuToggleBtn.setAttribute('aria-expanded', String(!isExpanded));
             appLayout.classList.toggle('menubar-open');
-            // No longer need to manage body overflow for this type of menu
         });
 
-        // Close menubar when a link inside it is clicked ONLY ON MOBILE
         mainMenubar.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', (event) => {
-                if (window.innerWidth < DESKTOP_BREAKPOINT) { // Only close on mobile
+                if (window.innerWidth < DESKTOP_BREAKPOINT) { 
                     if (appLayout.classList.contains('menubar-open')) {
-                        // Check if it's a link that JS will handle for scrolling within the page
                         const isTocLink = link.closest('.desktop-toc') && link.getAttribute('href')?.startsWith('#');
                         const isInterPaneLink = link.classList.contains('internal-link') && link.dataset.targetPaneItem;
-
                         if (isTocLink || isInterPaneLink || !link.getAttribute('href')?.startsWith('#')) {
-                             // Close for TOC links, inter-pane links, or non-hash links
                             menuToggleBtn.setAttribute('aria-expanded', 'false');
                             appLayout.classList.remove('menubar-open');
                         }
-                        // If it's a simple hash link not handled by other JS, let it navigate and stay open if user prefers
                     }
                 }
-                // On desktop, menubar remains open when clicking links inside it.
             });
         });
     }
@@ -635,71 +649,78 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function getScrollTargetOffset(targetElement, scrollContainer) {
         if (!targetElement || !scrollContainer) return 0;
-
         const containerRect = scrollContainer.getBoundingClientRect();
         const targetRect = targetElement.getBoundingClientRect();
-        
-        // This is the scrollContainer.scrollTop value that would make the targetElement's top
-        // align with the scrollContainer's top.
         const scrollTopToAlignTop = targetRect.top - containerRect.top + scrollContainer.scrollTop;
-
         let offsetDueToStickyHeader = 0;
-
-        // Check if the targetElement is one of the main H2-level section containers
         const isTargetMajorSection = targetElement.matches('#response-letter-heading, #guiding-principles-heading, #technology-policy-recommendations-heading');
-
         if (!isTargetMajorSection) {
-            // Target is an item within a major section (e.g., an article, a recommendation category)
             const contentSection = targetElement.closest('.content-section');
             if (contentSection) {
                 const stickyHeader = contentSection.querySelector('.sticky-section-header');
-                // Ensure the stickyHeader is actually sticky and is a direct child of the contentSection's structure
                 if (stickyHeader && getComputedStyle(stickyHeader).position === 'sticky' && stickyHeader.parentElement === contentSection) {
                     offsetDueToStickyHeader = stickyHeader.offsetHeight;
                 }
             }
         }
-        // If isTargetMajorSection, offsetDueToStickyHeader remains 0.
-        // This means we want the top of the major section (which includes its own sticky H2)
-        // to be positioned relative to the scroll pane's top, not relative to its own H2.
-
-        const desiredPadding = 15; // Desired space below the sticky header (if applicable) or below pane top.
-        
+        const desiredPadding = 15;
         let finalScrollOffset = desiredPadding; 
         if (!isTargetMajorSection && offsetDueToStickyHeader > 0) {
-            // For items within a section, position them below that section's sticky header.
             finalScrollOffset = offsetDueToStickyHeader + desiredPadding;
         }
-        
-        // scrollTopToAlignTop makes target's top align with container's top (0px from container top).
-        // Scrolling to 'scrollTopToAlignTop - X' makes target's top appear Xpx below container's top.
         return scrollTopToAlignTop - finalScrollOffset;
     }
 
-
-    function handleDesktopInterPaneLinking() { // Links from left-pane (RFI) to right-pane (Principles/Recs)
+    function handleDesktopInterPaneLinking() { 
         if (!rightPaneScroller) return;
         document.querySelectorAll('a.internal-link[data-target-pane-item]').forEach(link => {
             link.addEventListener('click', function(event) {
+                const linkElement = this; // The clicked <a> tag
+                const targetId = linkElement.dataset.targetPaneItem;
+                const targetElement = targetId ? document.getElementById(targetId) : null;
+
+                if (bodyElement.classList.contains('single-pane-mode')) {
+                    event.preventDefault(); // Take full control of navigation
+
+                    const sourceElement = linkElement.closest('article[id], div.recommendation-category[id]');
+                    const sourceId = sourceElement ? sourceElement.id : null;
+                    const currentHash = window.location.hash.substring(1);
+
+                    if (sourceId && sourceId !== targetId && sourceId !== currentHash) {
+                        // Push the source anchor to history. This changes URL but doesn't fire hashchange.
+                        // The user won't see an immediate scroll to sourceId.
+                        history.pushState(null, "", "#" + sourceId);
+                    }
+
+                    // Now, set the hash to targetId. This WILL fire hashchange.
+                    // handleInitialHash will scroll to targetId and highlight it.
+                    // This creates a new history entry if targetId is different from what pushState just set (i.e. sourceId).
+                    if (targetId) {
+                        // Check if the current hash (which might have been updated by pushState)
+                        // is already the targetId. If so, setting it again might be redundant
+                        // but harmless, or could ensure hashchange fires if it somehow didn't.
+                        // More simply, just set it. If it's the same, no new history entry. If different, new entry.
+                        window.location.hash = targetId;
+                    }
+                    return; 
+                }
+                
+                // Desktop two-pane mode logic:
                 if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-                    event.preventDefault(); // Always prevent default for these inter-pane links on desktop
-                    const targetId = this.dataset.targetPaneItem;
-                    const targetElement = document.getElementById(targetId);
-                    
+                    event.preventDefault(); // Prevent default only in two-pane desktop.
                     if (targetElement) { 
-                        // If targetElement is found, assume it's the correct one in the right pane for these specific links.
-                        // The .closest() check was removed as it might have been the source of the issue for principle links.
                         const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
                         rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
                         highlightTarget(targetElement);
-                        updateDesktopTocActiveState(targetId); // Update TOC in menubar
+                        updateDesktopTocActiveState(targetId);
+                        window.location.hash = targetId; // Update URL hash
                     } else {
-                        // If targetElement is not found, then fallback to hash and log a warning.
-                        console.warn('Inter-pane link target ID not found: ' + targetId); // Simplified console.warn
+                        console.warn('Inter-pane link target ID not found: ' + targetId);
                         window.location.hash = this.getAttribute('href'); 
                     }
                 }
-                // On mobile, default hash navigation will occur (event.preventDefault() is not called).
+                // On mobile (not single-pane mode here, and not desktop two-pane), 
+                // default hash navigation occurs as event.preventDefault() is not called.
             });
         });
     }
@@ -713,16 +734,41 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setupDesktopTocInteractions() { // Links within menubar TOC clicking to right-pane
-        if (window.innerWidth < DESKTOP_BREAKPOINT || !desktopTocElement || !rightPaneScroller || !rightPaneObservedContent) return;
+    function setupDesktopTocInteractions() { 
+        if (tocIntersectionObserver) {
+            tocIntersectionObserver.disconnect();
+            tocIntersectionObserver = null;
+        }
+        if (!desktopTocElement) return;
 
+        // Clear previous simple listeners if any, to avoid multiple bindings
         desktopTocElement.querySelectorAll('a').forEach(link => {
+            // A bit hacky to remove/re-add, ideally use a flag or more robust event management
+            const newLink = link.cloneNode(true);
+            link.parentNode.replaceChild(newLink, link);
+        });
+        
+        const currentTocLinks = desktopTocElement.querySelectorAll('a');
+
+        if (bodyElement.classList.contains('single-pane-mode') || window.innerWidth < DESKTOP_BREAKPOINT) {
+            // Simple anchor behavior for single-pane or mobile
+            currentTocLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    // Default behavior will scroll. Menubar closing is handled by generic listener.
+                    // No preventDefault here.
+                });
+            });
+            return; 
+        }
+
+        // For two-pane desktop mode:
+        if (!rightPaneScroller || !rightPaneObservedContent) return;
+
+        currentTocLinks.forEach(link => {
             link.addEventListener('click', function(event) {
-                event.preventDefault(); // Prevent default hash jump, we'll scroll smoothly
+                event.preventDefault(); 
                 const targetId = this.getAttribute('href').substring(1);
                 const targetElement = document.getElementById(targetId);
-                
-                // Ensure targetElement is within the right pane's observed content area
                 if (targetElement && rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
                      const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
                     rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
@@ -732,14 +778,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         });
 
-        // Intersection Observer for active TOC item on scroll in right pane
         const contentHeadings = Array.from(rightPaneObservedContent.querySelectorAll('h2[id], h3[id], h4[id], article[id]'));
-        
         let lastVisibleTocLink = null;
-
-        const observer = new IntersectionObserver(entries => {
+        tocIntersectionObserver = new IntersectionObserver(entries => {
             let bestVisibleEntry = null;
-            // Find the "best" visible entry (highest on screen or most visible)
             for (const entry of entries) {
                 if (entry.isIntersecting) {
                     if (!bestVisibleEntry || entry.boundingClientRect.top < bestVisibleEntry.boundingClientRect.top) {
@@ -747,78 +789,88 @@ document.addEventListener('DOMContentLoaded', () => {
                     }
                 }
             }
-
             if (bestVisibleEntry) {
                 const id = bestVisibleEntry.target.getAttribute('id');
                 const tocLink = desktopTocElement.querySelector(\`a[href="#\${id}"]\`);
                 if (tocLink && tocLink !== lastVisibleTocLink) {
-                    desktopTocElement.querySelectorAll('a').forEach(a => a.classList.remove('active-toc-item'));
-                    tocLink.classList.add('active-toc-item');
+                    updateDesktopTocActiveState(id); // Use the function for consistency
                     lastVisibleTocLink = tocLink;
-                    // Optional: scroll TOC to keep active link in view
-                    // tocLink.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'nearest' });
                 }
             }
         }, { 
-            root: rightPaneScroller, // Observe within the actual scrolling container
-            rootMargin: \`-\${headerHeight + 10}px 0px -75% 0px\`, // Adjust rootMargin if needed, this aims for top 25% of viewport
-            threshold: 0.01 // A small part of the element must be visible
+            root: rightPaneScroller, 
+            rootMargin: \`-\${headerHeight + 10}px 0px -75% 0px\`, 
+            threshold: 0.01 
         });
-        contentHeadings.forEach(heading => observer.observe(heading));
+        contentHeadings.forEach(heading => tocIntersectionObserver.observe(heading));
     }
     
     function handleInitialHash() {
+        updateHeaderHeightVar(); // Ensure headerHeight is current before any calculations
         const hash = window.location.hash.substring(1);
-        if (!hash) return;
-        const targetElement = document.getElementById(hash);
-        if (!targetElement) return;
 
-        setTimeout(() => { 
-            if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-                // Check if target is in the right pane (scrolled by rightPaneScroller)
-                if (rightPaneScroller && rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
-                    const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
-                    rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                    updateDesktopTocActiveState(hash);
-                // Check if target is in the left pane (scrolled by leftPaneHost)
-                } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
-                     const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
-                    leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                } else { // Fallback for elements not in specific panes or if panes are missing
-                    targetElement.scrollIntoView({ behavior: 'instant', block: 'start'});
-                }
-            } else { // Mobile scrolling
-                const elementTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
-                window.scrollTo({ top: elementTop - headerHeight - 10, behavior: 'instant' });
+        if (!hash) {
+            return;
+        }
+        const targetElement = document.getElementById(hash);
+        
+        if (!targetElement) {
+            console.warn("handleInitialHash: Target element for hash '" + hash + "' not found.");
+            return;
+        }
+
+        const isSinglePane = bodyElement.classList.contains('single-pane-mode');
+        const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
+
+        if (isSinglePane || !isDesktop) { // Single pane mode OR mobile (which is already single flow)
+            targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+            // If scrollIntoView works, next step is to adjust for header.
+            // A common, though sometimes imperfect, way after scrollIntoView:
+            // if (targetElement.getBoundingClientRect().top < (headerHeight + 15)) { // Check if it's under the header
+            //    window.scrollBy(0, -(headerHeight + 15 - targetElement.getBoundingClientRect().top));
+            // }
+            // Or, more reliably, stick to window.scrollTo with calculated offset if scrollIntoView alone isn't enough.
+
+            if (isSinglePane && isDesktop && desktopTocElement) {
+                updateDesktopTocActiveState(hash);
             }
-            highlightTarget(targetElement);
-        }, 100);
+        } else { // Desktop two-pane mode
+            if (rightPaneScroller && rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
+                const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
+                rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+                updateDesktopTocActiveState(hash);
+            } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
+                const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
+                leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+            } else { 
+                targetElement.scrollIntoView({ behavior: 'instant', block: 'start'});
+            }
+        }
+        highlightTarget(targetElement);
     }
 
     handleDesktopInterPaneLinking();
-    if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-        setupDesktopTocInteractions();
-    }
-    handleInitialHash();
-    window.addEventListener('hashchange', handleInitialHash, false);
+    setupDesktopTocInteractions(); // Initial setup based on current mode/size
+    
+    // Call handleInitialHash on initial load for any existing hash
+    handleInitialHash(); 
+
+    window.addEventListener('hashchange', () => {
+        console.log('[HashListener] hashchange event fired. New hash:', window.location.hash);
+        handleInitialHash();
+    }, false);
     
     let resizeTimeout;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            // Re-calculate header height on resize as it might change if title wraps etc.
-            const newHeaderHeight = headerElement ? headerElement.offsetHeight : 55;
-            document.documentElement.style.setProperty('--header-height', \`\${newHeaderHeight}px\`);
+            updateHeaderHeightVar(); // Recalculate header height
+            setupDesktopTocInteractions(); // Re-evaluate TOC interactions
             
+            // Menubar state on resize (existing logic)
             if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-                setupDesktopTocInteractions(); 
-                // If menubar was open and screen resizes to desktop, it remains open, which is fine.
-                // If it was open on mobile and screen resizes to desktop, user can toggle it.
-            } else {
-                // If resizing to mobile, ensure the menubar state is appropriate.
-                // If it was open and user resizes to mobile, it might be too wide.
-                // However, the CSS grid should handle the reflow.
-                // If menubar was open, ensure toggle button state is correct.
+                // No specific action needed for menubar itself, CSS handles width.
+            } else { // Resizing to mobile
                 if (appLayout.classList.contains('menubar-open')) {
                     menuToggleBtn.setAttribute('aria-expanded', 'true');
                 } else {
