@@ -173,7 +173,7 @@ async function generateSite() {
   let principlesHtml = '';
   for (const principle of principlesData) {
     principlesHtml += `<article id="${principle.id}" class="principle-item card">`;
-    principlesHtml += `<h3>${principle.text}</h3>`;
+    principlesHtml += `<h3 class="section-title">${principle.text} <a href="#${principle.id}" class="anchor-link" aria-label="Link to section: ${principle.text}">🔗</a></h3>`;
     principlesHtml += await markedInstance.parse(principle.originalMarkdown);
     principlesHtml += `</article>`;
   }
@@ -182,10 +182,10 @@ async function generateSite() {
   let recommendationsHtml = '';
   for (const category of recommendationsCategoryData) {
     recommendationsHtml += `<div id="${category.id}" class="recommendation-category">`;
-    recommendationsHtml += `<h3 class="category-title">${category.text}</h3>`;
+    recommendationsHtml += `<h3 class="category-title section-title">${category.text} <a href="#${category.id}" class="anchor-link" aria-label="Link to section: ${category.text}">🔗</a></h3>`;
     for (const rec of category.children || []) {
       recommendationsHtml += `<article id="${rec.id}" class="recommendation-item card">`;
-      recommendationsHtml += `<h4>${rec.text}</h4>`;
+      recommendationsHtml += `<h4 class="section-title">${rec.text} <a href="#${rec.id}" class="anchor-link" aria-label="Link to section: ${rec.text}">🔗</a></h4>`;
       recommendationsHtml += await markedInstance.parse(rec.originalMarkdown);
       recommendationsHtml += `</article>`;
     }
@@ -196,7 +196,7 @@ async function generateSite() {
   let letterHtml = '';
   for (const rfiQuestion of rfiQuestionsData) {
     letterHtml += `<article id="${rfiQuestion.id}" class="rfi-question card">`;
-    letterHtml += `<h3>${rfiQuestion.text}</h3>`;
+    letterHtml += `<h3 class="section-title">${rfiQuestion.text} <a href="#${rfiQuestion.id}" class="anchor-link" aria-label="Link to section: ${rfiQuestion.text}">🔗</a></h3>`;
     letterHtml += await markedInstance.parse(rfiQuestion.originalMarkdown);
     letterHtml += `</article>`;
   }
@@ -420,6 +420,26 @@ async function generateSite() {
     code { background-color: #e9ecef; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; font-family: Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; word-break: break-word; }
     pre { background-color: #e9ecef; padding: 1rem; border-radius: 0.25rem; overflow-x: auto;}
     pre code { padding:0; background-color: transparent; font-size: inherit; }
+
+    .section-title {
+      position: relative; /* For potential positioning of anchor, or just as a hook */
+    }
+    .anchor-link {
+      font-size: 0.8em; /* Smaller than heading */
+      font-weight: normal; /* Ensure it's not bold if heading is */
+      text-decoration: none;
+      color: var(--primary-blue);
+      opacity: 0.25; /* Subtle by default */
+      transition: opacity 0.2s ease-in-out;
+      margin-left: 0.3em;
+      vertical-align: middle; /* Align with text better */
+    }
+    .section-title:hover .anchor-link,
+    .anchor-link:hover, /* Make link itself hoverable */
+    .anchor-link:focus {
+      opacity: 1; /* Visible on hover/focus */
+      text-decoration: none; /* Keep no underline on hover for icon */
+    }
 
     .highlighted-item-temp { animation: highlight-animation 2.5s ease-out; }
     @keyframes highlight-animation { 0% { background-color: var(--highlight-bg); } 80% { background-color: var(--highlight-bg); } 100% { background-color: transparent; } }
