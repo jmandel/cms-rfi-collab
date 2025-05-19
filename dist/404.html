@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Page Not Found - Redirecting...</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; line-height: 1.6; color: #333; text-align: center; }
+    h1 { color: #007bff; }
+    p { font-size: 1.1em; }
+    a { color: #007bff; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .container { max-width: 600px; margin: 50px auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+  </style>
+  <script>
+    (function() {
+      // Get the current path that caused the 404
+      var path = window.location.pathname;
+
+      // Remove leading slash, if any
+      if (path.startsWith('/')) {
+        path = path.substring(1);
+      }
+
+      // Remove .html extension, if any
+      if (path.endsWith('.html')) {
+        path = path.substring(0, path.length - '.html'.length);
+      }
+      
+      // If the path is empty after processing (e.g. was just "/" or "/index.html" which somehow 404ed),
+      // or if it's '404' (meaning we are on the 404.html page itself directly),
+      // redirect to the root. Otherwise, redirect to the path as a hash.
+      if (path && path !== '404') {
+        var newUrl = window.location.origin + '/#' + path;
+        window.location.replace(newUrl);
+      } else {
+        // Fallback to root if path is empty or '404'
+        window.location.replace(window.location.origin + '/');
+      }
+    })();
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Page Not Found</h1>
+    <p>We couldn't find the page you were looking for.</p>
+    <p>We're attempting to redirect you to the correct section of the main page. If you are not redirected automatically, please <a href="/">click here to go to the homepage</a>.</p>
+  </div>
+</body>
+</html>
