@@ -283,6 +283,84 @@ async function generateSite() {
   // Pre-construct the problematic JavaScript string for rootMargin
   const jsObserverRootMargin = '`-${headerHeight + 10}px 0px -75% 0px`';
 
+  // Helper function for generating individual pages
+  async function generateIndividualPage(id: string, title: string, markdownToParse: string, marked: Marked) {
+      const filename = path.join(OUTPUT_DIR, `${id}.html`);
+      // Ensure title is safe for HTML
+      const pageTitle = title.replace(/</g, '<').replace(/>/g, '>');
+      const itemHtmlContent = await marked.parse(markdownToParse);
+      const redirectScript = `<script>window.location.href = '/#${id}';</script>`;
+      const metaRefresh = `<meta http-equiv="refresh" content="0; url=/#${id}">`;
+      
+      const individualPageHtml = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>${pageTitle}</title>
+  ${metaRefresh}
+  ${redirectScript}
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; line-height: 1.6; color: #333; }
+    h1 { border-bottom: 2px solid #007bff; padding-bottom: 0.3em; color: #007bff; }
+    a { color: #007bff; }
+    code { background-color: #e9ecef; padding: 0.2em 0.4em; margin: 0; font-size: 85%; border-radius: 3px; }
+    pre { background-color: #e9ecef; padding: 1rem; border-radius: 0.25rem; overflow-x: auto;}
+    pre code { padding:0; background-color: transparent; font-size: inherit; }
+    img { max-width: 100%; height: auto; }
+    table { border-collapse: collapse; width: 100%; margin-bottom: 1rem; }
+    th, td { border: 1px solid #dee2e6; padding: 0.75rem; vertical-align: top; }
+    th { background-color: #f8f9fa; font-weight: bold; }
+    blockquote { border-left: 4px solid #007bff; padding-left: 1rem; margin-left: 0; color: #6c757d; }
+  </style>
+</head>
+<body>
+  <h1>${pageTitle}</h1>
+  ${itemHtmlContent}
+  <hr style="margin-top: 2em; margin-bottom: 1em;">
+  <p>If you are not automatically redirected, <a href="/#${id}">click here to go to the main page section</a>.</p>
+</body>
+</html>`;
+      writeFileSync(filename, individualPageHtml);
+      console.log(`Generated fallback page: ${filename}`);
+  }
+
+  // Generate individual HTML pages for SEO and no-JS fallback
+  // Ensure this happens *before* the finalHtml for index.html is constructed if it needs these files,
+  // but in this case, these are standalone fallbacks.
+
+  // Generate pages for top-level sections (using the full markdown for that section)
+  await generateIndividualPage('response-letter-heading', 'Response Letter', letterMd, markedInstance);
+  await generateIndividualPage('guiding-principles-heading', 'Guiding Principles', principlesMd, markedInstance);
+  await generateIndividualPage('technology-policy-recommendations-heading', 'Technology Policy Recommendations', recommendationsMd, markedInstance);
+
+  // Generate pages for Guiding Principles items
+  for (const principle of principlesData) {
+      await generateIndividualPage(principle.id, principle.text, principle.originalMarkdown, markedInstance);
+  }
+
+  // Generate pages for Recommendations (Categories and individual Recs)
+  for (const category of recommendationsCategoryData) {
+      let categoryMarkdownForPage = `This section, "${category.text}", includes the following recommendations:\n\n`;
+      if (category.children && category.children.length > 0) {
+          for (const rec of category.children) {
+              // Link to the recommendation's own static page, which will then redirect.
+              categoryMarkdownForPage += `- [${rec.text}](${rec.id}.html)\n`;
+          }
+      } else {
+          categoryMarkdownForPage = `(No specific recommendations listed directly under this category heading).`;
+      }
+      await generateIndividualPage(category.id, category.text, categoryMarkdownForPage, markedInstance);
+
+      for (const rec of category.children || []) {
+          await generateIndividualPage(rec.id, rec.text, rec.originalMarkdown, markedInstance);
+      }
+  }
+
+  // Generate pages for RFI Questions
+  for (const rfiQuestion of rfiQuestionsData) {
+      await generateIndividualPage(rfiQuestion.id, rfiQuestion.text, rfiQuestion.originalMarkdown, markedInstance);
+  }
+
   const finalHtml = `
 <!DOCTYPE html>
 <html lang="en">
