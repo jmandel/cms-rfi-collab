@@ -171,10 +171,23 @@ async function generateSite() {
 
   const principlesData = preParseSection(principlesMd, 3, 'principle');
   let principlesHtml = '';
+  // btoa and atob are not available in Node.js environment directly,
+  // but they will be available in the browser environment where the script runs.
+  // For Node.js side generation, we'll use Buffer for Base64.
+
   for (const principle of principlesData) {
+    const base64EncodedText = Buffer.from(principle.text).toString('base64');
+    const base64EncodedMarkdown = Buffer.from(principle.originalMarkdown).toString('base64');
+    
     principlesHtml += `<article id="${principle.id}" class="principle-item card">`;
+    principlesHtml += `<div class="card-header">`;
     principlesHtml += `<h3 class="section-title">${principle.text} <a href="#${principle.id}" class="anchor-link" aria-label="Link to section: ${principle.text}">🔗</a></h3>`;
+    principlesHtml += `<div class="item-actions">`;
+    principlesHtml += `<button class="copy-btn" data-id="${principle.id}" data-text="${base64EncodedText}">Copy</button>`;
+    principlesHtml += `<button class="share-btn" data-id="${principle.id}" data-text="${base64EncodedText}" style="display:none;">Share</button>`;
+    principlesHtml += `</div></div>`;
     principlesHtml += await markedInstance.parse(principle.originalMarkdown);
+    principlesHtml += `<div id="md-${principle.id}" style="display:none;">${base64EncodedMarkdown}</div>`;
     principlesHtml += `</article>`;
   }
 
@@ -184,9 +197,18 @@ async function generateSite() {
     recommendationsHtml += `<div id="${category.id}" class="recommendation-category">`;
     recommendationsHtml += `<h3 class="category-title section-title">${category.text} <a href="#${category.id}" class="anchor-link" aria-label="Link to section: ${category.text}">🔗</a></h3>`;
     for (const rec of category.children || []) {
+      const base64EncodedRecText = Buffer.from(rec.text).toString('base64');
+      const base64EncodedRecMarkdown = Buffer.from(rec.originalMarkdown).toString('base64');
+
       recommendationsHtml += `<article id="${rec.id}" class="recommendation-item card">`;
+      recommendationsHtml += `<div class="card-header">`;
       recommendationsHtml += `<h4 class="section-title">${rec.text} <a href="#${rec.id}" class="anchor-link" aria-label="Link to section: ${rec.text}">🔗</a></h4>`;
+      recommendationsHtml += `<div class="item-actions">`;
+      recommendationsHtml += `<button class="copy-btn" data-id="${rec.id}" data-text="${base64EncodedRecText}">Copy</button>`;
+      recommendationsHtml += `<button class="share-btn" data-id="${rec.id}" data-text="${base64EncodedRecText}" style="display:none;">Share</button>`;
+      recommendationsHtml += `</div></div>`;
       recommendationsHtml += await markedInstance.parse(rec.originalMarkdown);
+      recommendationsHtml += `<div id="md-${rec.id}" style="display:none;">${base64EncodedRecMarkdown}</div>`;
       recommendationsHtml += `</article>`;
     }
     recommendationsHtml += `</div>`;
@@ -413,7 +435,39 @@ async function generateSite() {
     
     article h3 {font-size: 1.2rem;} 
     article h4 {font-size: 1.1rem;}
-    article h3, article h4 { margin-top: 0; margin-bottom: 0.5em; color: #1f2937; }
+    /* article h3, article h4 { margin-top: 0; margin-bottom: 0.5em; color: #1f2937; } */ /* Adjusted by card-header */
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start; /* Align items to the start of the cross axis */
+        margin-bottom: 0.5em;
+    }
+    .card-header .section-title {
+        margin-top: 0;
+        margin-bottom: 0; /* Remove bottom margin if buttons are present */
+        color: #1f2937;
+        flex-grow: 1; /* Allow title to take available space */
+    }
+    .item-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-left: 1rem; /* Space between title and buttons */
+        flex-shrink: 0; /* Prevent buttons from shrinking */
+    }
+    .item-actions button {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: var(--text-light);
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
+        border-radius: 0.2rem;
+        cursor: pointer;
+        white-space: nowrap;
+    }
+    .item-actions button:hover {
+        background-color: #d6dce1;
+    }
 
     a.internal-link { color: var(--primary-blue); text-decoration: none; }
     a.internal-link:hover { text-decoration: underline; }
@@ -594,11 +648,66 @@ document.addEventListener('DOMContentLoaded', () => {
     const mainMenubar = document.getElementById('main-menubar');
     const singlePaneToggle = document.getElementById('single-pane-toggle');
     
-    const leftPaneHost = document.getElementById('rfi-letter-pane-host'); 
-    const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper'); 
-    const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host'); 
+    const leftPaneHost = document.getElementById('rfi-letter-pane-host');
+    const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper');
+    const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host');
     const desktopTocElement = mainMenubar.querySelector('.desktop-toc');
     let tocIntersectionObserver = null;
+
+    // Copy and Share functionality
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const buttonEl = event.target; 
+            const id = buttonEl.dataset.id;
+            const base64Text = buttonEl.dataset.text;
+            const text = atob(base64Text || '');
+            
+            let markdownContent = "Error retrieving markdown content.";
+            const markdownHostId = \`md-\${id}\`;
+            const markdownHostEl = document.getElementById(markdownHostId);
+
+            if (markdownHostEl) {
+                const base64Markdown = markdownHostEl.textContent || '';
+                markdownContent = atob(base64Markdown);
+            } else {
+                console.error(\`Markdown host element not found: #\${markdownHostId}\`);
+            }
+            
+            const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
+            const copyText = \`\${text}\n\${url}\n\n\${markdownContent}\`;
+            try {
+                await navigator.clipboard.writeText(copyText);
+                buttonEl.textContent = 'Copied!';
+                setTimeout(() => { buttonEl.textContent = 'Copy'; }, 2000);
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                buttonEl.textContent = 'Error';
+                setTimeout(() => { buttonEl.textContent = 'Copy'; }, 2000);
+            }
+        });
+    });
+
+    if (navigator.share) {
+        document.querySelectorAll('.share-btn').forEach(button => {
+            button.style.display = 'inline-block'; // Show share button
+            button.addEventListener('click', async (event) => {
+                const buttonEl = event.target;
+                const id = buttonEl.dataset.id;
+                const base64Text = buttonEl.dataset.text;
+                const text = atob(base64Text || '');
+                const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
+                try {
+                    await navigator.share({
+                        title: text,
+                        text: \`Check out this section: \${text}\`, // Optional: more descriptive text
+                        url: url,
+                    });
+                } catch (err) {
+                    console.error('Error sharing: ', err);
+                }
+            });
+        });
+    }
 
 
     function applySinglePaneMode(isSinglePane) {
