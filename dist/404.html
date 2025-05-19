@@ -13,29 +13,48 @@
   </style>
   <script>
     (function() {
-      // Get the current path that caused the 404
-      var path = window.location.pathname;
+      const REPO_NAME = "cms-rfi-collab"; // Configure this for your specific GitHub repository name
+      const repoPathPrefix = "/" + REPO_NAME.toLowerCase() + "/"; // e.g., "/cms-rfi-collab/"
+      
+      let currentFullPth = window.location.pathname; // Path that caused the 404
+      let siteBasePath = "/"; // Default for sites at the root of a domain
+      let pathForFragmentExtraction = "";
 
-      // Remove leading slash, if any
-      if (path.startsWith('/')) {
-        path = path.substring(1);
+      if (REPO_NAME && currentFullPth.toLowerCase().startsWith(repoPathPrefix)) {
+        // This is a GitHub Project page, and the path includes the repo name
+        siteBasePath = "/" + REPO_NAME + "/"; // Maintain original casing for repo name in redirect
+        pathForFragmentExtraction = currentFullPth.substring(siteBasePath.length);
+      } else {
+        // Site is at the root of the domain, or path doesn't include the repo prefix
+        // (e.g. custom domain, or user/org page like username.github.io)
+        pathForFragmentExtraction = currentFullPth.startsWith('/') ? currentFullPth.substring(1) : currentFullPth;
       }
 
-      // Remove .html extension, if any
-      if (path.endsWith('.html')) {
-        path = path.substring(0, path.length - '.html'.length);
+      // Clean the extracted path to create a fragment
+      let fragment = pathForFragmentExtraction;
+      if (fragment.endsWith('.html')) {
+        fragment = fragment.substring(0, fragment.length - '.html'.length);
+      }
+
+      // If fragment becomes 'index' or '404' (e.g. from /repo/index.html or /repo/somepath/404.html),
+      // or if it's empty, we want to redirect to the base of the site.
+      // Also handle cases like "path/to/index"
+      const lastSegment = fragment.substring(fragment.lastIndexOf('/') + 1);
+      if (lastSegment === 'index' || lastSegment === '404') {
+         fragment = fragment.substring(0, fragment.lastIndexOf('/')); // Get path up to "index" or "404"
       }
       
-      // If the path is empty after processing (e.g. was just "/" or "/index.html" which somehow 404ed),
-      // or if it's '404' (meaning we are on the 404.html page itself directly),
-      // redirect to the root. Otherwise, redirect to the path as a hash.
-      if (path && path !== '404') {
-        var newUrl = window.location.origin + '/#' + path;
-        window.location.replace(newUrl);
-      } else {
-        // Fallback to root if path is empty or '404'
-        window.location.replace(window.location.origin + '/');
+      if (fragment === '' || fragment === '/') { // If fragment is now empty or just a slash
+        fragment = ''; // Redirect to site base (e.g. /repo/ or /)
+      } else if (fragment.endsWith('/')) { // Clean trailing slash if any from "path/to/"
+         fragment = fragment.substring(0, fragment.length -1);
       }
+
+      // Construct the final redirect URL
+      let redirectTargetUrl = siteBasePath + (fragment ? '#' + fragment : '');
+      
+      window.location.replace(window.location.origin + redirectTargetUrl);
+
     })();
   </script>
 </head>
@@ -43,7 +62,7 @@
   <div class="container">
     <h1>Page Not Found</h1>
     <p>We couldn't find the page you were looking for.</p>
-    <p>We're attempting to redirect you to the correct section of the main page. If you are not redirected automatically, please <a href="/">click here to go to the homepage</a>.</p>
+    <p>We are attempting to redirect you to the correct part of the site. If you are not redirected automatically, please <a href="./">click here to go to the homepage</a>.</p>
   </div>
 </body>
 </html>

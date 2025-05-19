@@ -6,6 +6,7 @@ import path from 'path';
 const INPUT_MD_FILE = 'index.md';
 const OUTPUT_DIR = 'dist';
 const OUTPUT_HTML_FILE = path.join(OUTPUT_DIR, 'index.html');
+const REPO_NAME_CONST = "cms-rfi-collab"; // Used for generating correct redirect paths
 // CSS will be inline in HTML
 
 interface HeadingData {
@@ -286,19 +287,38 @@ async function generateSite() {
   // Helper function for generating individual pages
   async function generateIndividualPage(id: string, title: string, markdownToParse: string, marked: Marked) {
       const filename = path.join(OUTPUT_DIR, `${id}.html`);
-      // Ensure title is safe for HTML
-      const pageTitle = title.replace(/</g, '<').replace(/>/g, '>');
+      // Correct HTML entity sanitization for the title
+      const pageTitle = title.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
       const itemHtmlContent = await marked.parse(markdownToParse);
-      const redirectScript = `<script>window.location.href = '/#${id}';</script>`;
-      const metaRefresh = `<meta http-equiv="refresh" content="0; url=/#${id}">`;
+
+      // For meta refresh and fallback link, use a simple relative path to index.html + hash.
+      // This works because [slug].html and index.html are in the same 'dist' directory.
+      // const nonJsFallbackUrl = `index.html#${id}`; 
+      // const metaRefreshTag = `<meta http-equiv="refresh" content="0; url=${nonJsFallbackUrl}">`;
+      // const fallbackLinkHref = nonJsFallbackUrl;
+
+      // Simplified JavaScript redirect logic: preserve path up to current file, add #slug
+      const jsRedirectLogic = `
+    (function() {
+      const targetIdJs = "${id}"; // Injected from generator
+      const currentPath = window.location.pathname; // e.g., "/slug.html" or "/repo/slug.html"
+      // Directory containing slug.html, relative to origin. Ensures leading slash.
+      const dirPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1); 
+      
+      const finalRedirectUrl = window.location.origin + dirPath + "#" + targetIdJs;
+      window.location.replace(finalRedirectUrl);
+    })();
+  `;
+      // Minify the script slightly for embedding
+      const redirectScriptTag = `<script>${jsRedirectLogic.replace(/\s*\n\s*/g, ' ').trim()}</script>`;
       
       const individualPageHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <title>${pageTitle}</title>
-  ${metaRefresh}
-  ${redirectScript}
+  
+  ${redirectScriptTag}
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; line-height: 1.6; color: #333; }
     h1 { border-bottom: 2px solid #007bff; padding-bottom: 0.3em; color: #007bff; }
@@ -316,8 +336,6 @@ async function generateSite() {
 <body>
   <h1>${pageTitle}</h1>
   ${itemHtmlContent}
-  <hr style="margin-top: 2em; margin-bottom: 1em;">
-  <p>If you are not automatically redirected, <a href="/#${id}">click here to go to the main page section</a>.</p>
 </body>
 </html>`;
       writeFileSync(filename, individualPageHtml);
