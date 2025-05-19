@@ -297,20 +297,20 @@ async function generateSite() {
       // const metaRefreshTag = `<meta http-equiv="refresh" content="0; url=${nonJsFallbackUrl}">`;
       // const fallbackLinkHref = nonJsFallbackUrl;
 
-      // Simplified JavaScript redirect logic: preserve path up to current file, add #slug
+      // New JavaScript redirect logic
       const jsRedirectLogic = `
     (function() {
-      const targetIdJs = "${id}"; // Injected from generator
-      const currentPath = window.location.pathname; // e.g., "/slug.html" or "/repo/slug.html"
-      // Directory containing slug.html, relative to origin. Ensures leading slash.
-      const dirPath = currentPath.substring(0, currentPath.lastIndexOf('/') + 1); 
-      
-      const finalRedirectUrl = window.location.origin + dirPath + "#" + targetIdJs;
+      const slug = "${id}"; // Injected from generator
+      const currentLoc = window.location;
+      const currentPathname = currentLoc.pathname;
+      // Example: /path/to/dist/slug.html -> /path/to/dist
+      const basePath = currentPathname.substring(0, currentPathname.lastIndexOf('/'));
+      const finalRedirectUrl = currentLoc.origin + basePath + '/?singlePane=true#' + slug;
       window.location.replace(finalRedirectUrl);
     })();
   `;
       // Minify the script slightly for embedding
-      const redirectScriptTag = `<script>${jsRedirectLogic.replace(/\s*\n\s*/g, ' ').trim()}</script>`;
+      const redirectScriptTag = `<script>${jsRedirectLogic.trim()}</script>`;
       
       const individualPageHtml = `<!DOCTYPE html>
 <html lang="en">

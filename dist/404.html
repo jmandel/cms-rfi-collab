@@ -13,48 +13,50 @@
   </style>
   <script>
     (function() {
-      const REPO_NAME = "cms-rfi-collab"; // Configure this for your specific GitHub repository name
-      const repoPathPrefix = "/" + REPO_NAME.toLowerCase() + "/"; // e.g., "/cms-rfi-collab/"
-      
-      let currentFullPth = window.location.pathname; // Path that caused the 404
-      let siteBasePath = "/"; // Default for sites at the root of a domain
-      let pathForFragmentExtraction = "";
+      const currentLoc = window.location; // URL that resulted in 404
+      const currentPathname = currentLoc.pathname;
 
-      if (REPO_NAME && currentFullPth.toLowerCase().startsWith(repoPathPrefix)) {
-        // This is a GitHub Project page, and the path includes the repo name
-        siteBasePath = "/" + REPO_NAME + "/"; // Maintain original casing for repo name in redirect
-        pathForFragmentExtraction = currentFullPth.substring(siteBasePath.length);
+      // Determine the slug: current page path final segment
+      let slug = currentPathname;
+      if (slug.endsWith('.html')) {
+        slug = slug.substring(0, slug.length - '.html'.length);
+      }
+      if (slug.endsWith('/')) { // e.g. /foo/bar/
+        slug = slug.substring(0, slug.length - 1); // slug becomes /foo/bar
+      }
+      // Extract final segment
+      slug = slug.substring(slug.lastIndexOf('/') + 1); // e.g., /foo/bar -> bar; /foo -> foo
+
+      // Determine the new base: delete everything from and including the final slash
+      // from the original currentPathname.
+      // e.g. /foo/bar.html -> /foo; /foo/bar/ -> /foo; /foo -> "" (empty string for root)
+      const basePath = currentPathname.substring(0, currentPathname.lastIndexOf('/'));
+
+      let finalRedirectUrl;
+      // If slug is empty (e.g., path was '/' or '/somepath/'), or 'index',
+      // redirect to the basePath's presumed index page without a hash.
+      if (slug === '' || slug === 'index') {
+        finalRedirectUrl = currentLoc.origin + basePath + '/?singlePane=true';
       } else {
-        // Site is at the root of the domain, or path doesn't include the repo prefix
-        // (e.g. custom domain, or user/org page like username.github.io)
-        pathForFragmentExtraction = currentFullPth.startsWith('/') ? currentFullPth.substring(1) : currentFullPth;
-      }
-
-      // Clean the extracted path to create a fragment
-      let fragment = pathForFragmentExtraction;
-      if (fragment.endsWith('.html')) {
-        fragment = fragment.substring(0, fragment.length - '.html'.length);
-      }
-
-      // If fragment becomes 'index' or '404' (e.g. from /repo/index.html or /repo/somepath/404.html),
-      // or if it's empty, we want to redirect to the base of the site.
-      // Also handle cases like "path/to/index"
-      const lastSegment = fragment.substring(fragment.lastIndexOf('/') + 1);
-      if (lastSegment === 'index' || lastSegment === '404') {
-         fragment = fragment.substring(0, fragment.lastIndexOf('/')); // Get path up to "index" or "404"
+        finalRedirectUrl = currentLoc.origin + basePath + '/?singlePane=true#' + slug;
       }
       
-      if (fragment === '' || fragment === '/') { // If fragment is now empty or just a slash
-        fragment = ''; // Redirect to site base (e.g. /repo/ or /)
-      } else if (fragment.endsWith('/')) { // Clean trailing slash if any from "path/to/"
-         fragment = fragment.substring(0, fragment.length -1);
+      // Update the message on the page before redirecting (optional, as redirect is immediate)
+      const pElements = document.getElementsByTagName('p');
+      if (pElements.length > 1) {
+        const messagePTag = pElements[1]; // Assuming the second p tag is the one with the link
+        const linkTag = messagePTag.getElementsByTagName('a')[0];
+        messagePTag.innerHTML = 'We are attempting to redirect you. If you are not redirected automatically, please click here: ';
+        if (linkTag) {
+            linkTag.href = finalRedirectUrl; // Update fallback link
+            linkTag.textContent = finalRedirectUrl;
+            messagePTag.appendChild(linkTag);
+        } else { // Fallback if link tag somehow not found
+            messagePTag.innerHTML = 'Attempting to redirect to: <a href="' + finalRedirectUrl + '">' + finalRedirectUrl + '</a>...';
+        }
       }
-
-      // Construct the final redirect URL
-      let redirectTargetUrl = siteBasePath + (fragment ? '#' + fragment : '');
       
-      window.location.replace(window.location.origin + redirectTargetUrl);
-
+      window.location.replace(finalRedirectUrl);
     })();
   </script>
 </head>
