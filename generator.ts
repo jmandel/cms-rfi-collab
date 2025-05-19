@@ -627,6 +627,7 @@ async function generateSite() {
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
+    // --- Constants and State Variables ---
     if ('scrollRestoration' in history) {
         history.scrollRestoration = 'manual';
     }
@@ -634,13 +635,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const bodyElement = document.body;
     const appLayout = document.querySelector('.app-layout');
     const headerElement = document.querySelector('.site-header');
-    let headerHeight = headerElement ? headerElement.offsetHeight : 55; // Made let
-    
-    function updateHeaderHeightVar() {
-        headerHeight = headerElement ? headerElement.offsetHeight : 55;
-        document.documentElement.style.setProperty('--header-height', \`\${headerHeight}px\`);
-    }
-    updateHeaderHeightVar(); // Initial call
+    let headerHeight = headerElement ? headerElement.offsetHeight : 55;
 
     const menuToggleBtn = document.getElementById('menu-toggle-btn');
     const mainMenubar = document.getElementById('main-menubar');
@@ -649,153 +644,14 @@ document.addEventListener('DOMContentLoaded', () => {
     const leftPaneHost = document.getElementById('rfi-letter-pane-host');
     const rightPaneScroller = document.getElementById('principles-recommendations-pane-wrapper');
     const rightPaneObservedContent = document.getElementById('principles-recommendations-pane-host');
-    const desktopTocElement = mainMenubar.querySelector('.desktop-toc');
+    const desktopTocElement = mainMenubar ? mainMenubar.querySelector('.desktop-toc') : null;
     let tocIntersectionObserver = null;
 
-    // Copy and Share functionality
-    document.querySelectorAll('.copy-btn').forEach(button => {
-        button.addEventListener('click', async (event) => {
-            const buttonEl = event.target; 
-            const id = buttonEl.dataset.id;
-            const base64Text = buttonEl.dataset.text;
-            const text = atob(base64Text || '');
-            
-            let markdownContent = "Error retrieving markdown content.";
-            const markdownHostId = \`md-\${id}\`;
-            const markdownHostEl = document.getElementById(markdownHostId);
+    // --- Helper Functions ---
 
-            if (markdownHostEl) {
-                const base64Markdown = markdownHostEl.textContent || '';
-                markdownContent = atob(base64Markdown);
-            } else {
-                console.error(\`Markdown host element not found: #\${markdownHostId}\`);
-            }
-            
-            const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
-            const copyText = \`\${text}\n\${url}\n\n\${markdownContent}\`;
-            try {
-                await navigator.clipboard.writeText(copyText);
-                buttonEl.textContent = 'Copied!';
-                setTimeout(() => { buttonEl.textContent = 'Copy'; }, 2000);
-            } catch (err) {
-                console.error('Failed to copy: ', err);
-                buttonEl.textContent = 'Error';
-                setTimeout(() => { buttonEl.textContent = 'Copy'; }, 2000);
-            }
-        });
-    });
-
-    if (navigator.share) {
-        document.querySelectorAll('.share-btn').forEach(button => {
-            button.style.display = 'inline-block'; // Show share button
-            button.addEventListener('click', async (event) => {
-                const buttonEl = event.target;
-                const id = buttonEl.dataset.id;
-                const base64Text = buttonEl.dataset.text;
-                const text = atob(base64Text || '');
-                const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
-                try {
-                    await navigator.share({
-                        title: text,
-                        text: \`Check out this section: \${text}\`, // Optional: more descriptive text
-                        url: url,
-                    });
-                } catch (err) {
-                    console.error('Error sharing: ', err);
-                }
-            });
-        });
-    }
-
-
-    function applySinglePaneMode(isSinglePane) {
-        if (isSinglePane) {
-            bodyElement.classList.add('single-pane-mode');
-        } else {
-            bodyElement.classList.remove('single-pane-mode');
-        }
-        if (singlePaneToggle) {
-            singlePaneToggle.checked = isSinglePane;
-        }
-        // Re-evaluate TOC interactions since layout changed
-        setupDesktopTocInteractions(); 
-    }
-
-    function updateURLForSinglePane(isSinglePane) {
-        const url = new URL(window.location.href);
-        if (isSinglePane) {
-            url.searchParams.set('singlePane', 'true');
-        } else {
-            url.searchParams.delete('singlePane');
-        }
-        history.replaceState({}, '', url.toString());
-    }
-
-    if (singlePaneToggle) {
-        const urlParams = new URLSearchParams(window.location.search);
-        let initialSinglePane;
-
-        if (window.innerWidth < DESKTOP_BREAKPOINT) { // Mobile view
-            if (urlParams.has('singlePane')) { // Check if the parameter exists
-                initialSinglePane = urlParams.get('singlePane') === 'true'; // Respect explicit param
-            } else {
-                initialSinglePane = true; // Default to true on mobile if param is absent
-            }
-        } else { // Desktop view
-            initialSinglePane = urlParams.get('singlePane') === 'true'; // Default to false unless param is true
-        }
-        
-        applySinglePaneMode(initialSinglePane); // Applies class and sets checkbox
-
-        singlePaneToggle.addEventListener('change', (event) => {
-            const isChecked = event.target.checked;
-            applySinglePaneMode(isChecked);
-            updateURLForSinglePane(isChecked);
-        });
-    }
-
-
-    if (menuToggleBtn && mainMenubar && appLayout) {
-        menuToggleBtn.addEventListener('click', () => {
-            const isExpanded = menuToggleBtn.getAttribute('aria-expanded') === 'true';
-            menuToggleBtn.setAttribute('aria-expanded', String(!isExpanded));
-            appLayout.classList.toggle('menubar-open');
-        });
-
-        mainMenubar.querySelectorAll('a').forEach(link => {
-            // General listener for non-TOC links within the menubar.
-            // TOC links are handled in setupDesktopTocInteractions.
-            link.addEventListener('click', (event) => {
-                const isMobile = window.innerWidth < DESKTOP_BREAKPOINT;
-                const isMenuOpen = appLayout.classList.contains('menubar-open');
-                const isTocLink = link.closest('.desktop-toc');
-
-                if (isMobile && isMenuOpen && !isTocLink) {
-                    // Instant close for non-TOC mobile menu links
-                    event.preventDefault();
-                    const href = link.getAttribute('href');
-
-                    const originalAppLayoutTransition = appLayout.style.transition;
-                    const originalMenubarTransition = mainMenubar.style.transition;
-                    appLayout.style.transition = 'none';
-                    mainMenubar.style.transition = 'none';
-
-                    menuToggleBtn.setAttribute('aria-expanded', 'false');
-                    appLayout.classList.remove('menubar-open');
-
-                    void appLayout.offsetHeight; // Force reflow
-                    void mainMenubar.offsetHeight;
-
-                    appLayout.style.transition = originalAppLayoutTransition;
-                    mainMenubar.style.transition = originalMenubarTransition;
-
-                    if (href) {
-                        if (href.startsWith('#')) window.location.hash = href;
-                        else window.location.href = href;
-                    }
-                }
-            });
-        });
+    function updateHeaderHeightVar() {
+        headerHeight = headerElement ? headerElement.offsetHeight : 55;
+        document.documentElement.style.setProperty('--header-height', \`\${headerHeight}px\`);
     }
 
     function highlightTarget(targetElement) {
@@ -830,60 +686,6 @@ document.addEventListener('DOMContentLoaded', () => {
         return scrollTopToAlignTop - finalScrollOffset;
     }
 
-    function handleDesktopInterPaneLinking() { 
-        if (!rightPaneScroller) return;
-        document.querySelectorAll('a.internal-link[data-target-pane-item]').forEach(link => {
-            link.addEventListener('click', function(event) {
-                const linkElement = this; // The clicked <a> tag
-                const targetId = linkElement.dataset.targetPaneItem;
-                const targetElement = targetId ? document.getElementById(targetId) : null;
-
-                if (bodyElement.classList.contains('single-pane-mode')) {
-                    event.preventDefault(); // Take full control of navigation
-
-                    const sourceElement = linkElement.closest('article[id], div.recommendation-category[id]');
-                    const sourceId = sourceElement ? sourceElement.id : null;
-                    const currentHash = window.location.hash.substring(1);
-
-                    if (sourceId && sourceId !== targetId && sourceId !== currentHash) {
-                        // Push the source anchor to history. This changes URL but doesn't fire hashchange.
-                        // The user won't see an immediate scroll to sourceId.
-                        history.pushState(null, "", "#" + sourceId);
-                    }
-
-                    // Now, set the hash to targetId. This WILL fire hashchange.
-                    // handleInitialHash will scroll to targetId and highlight it.
-                    // This creates a new history entry if targetId is different from what pushState just set (i.e. sourceId).
-                    if (targetId) {
-                        // Check if the current hash (which might have been updated by pushState)
-                        // is already the targetId. If so, setting it again might be redundant
-                        // but harmless, or could ensure hashchange fires if it somehow didn't.
-                        // More simply, just set it. If it's the same, no new history entry. If different, new entry.
-                        window.location.hash = targetId;
-                    }
-                    return; 
-                }
-                
-                // Desktop two-pane mode logic:
-                if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-                    event.preventDefault(); // Prevent default only in two-pane desktop.
-                    if (targetElement) { 
-                        const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
-                        rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                        highlightTarget(targetElement);
-                        updateDesktopTocActiveState(targetId);
-                        window.location.hash = targetId; // Update URL hash
-                    } else {
-                        console.warn('Inter-pane link target ID not found: ' + targetId);
-                        window.location.hash = this.getAttribute('href'); 
-                    }
-                }
-                // On mobile (not single-pane mode here, and not desktop two-pane), 
-                // default hash navigation occurs as event.preventDefault() is not called.
-            });
-        });
-    }
-    
     function updateDesktopTocActiveState(targetId) {
         if (!desktopTocElement) return;
         desktopTocElement.querySelectorAll('a').forEach(a => a.classList.remove('active-toc-item'));
@@ -893,185 +695,93 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function setupDesktopTocInteractions() { 
-        if (tocIntersectionObserver) {
-            tocIntersectionObserver.disconnect();
-            tocIntersectionObserver = null;
-        }
-        if (!desktopTocElement) return;
+    function closeMenuInstantly() {
+        if (!menuToggleBtn || !appLayout || !mainMenubar) return;
+        const originalAppLayoutTransition = appLayout.style.transition;
+        const originalMenubarTransition = mainMenubar.style.transition;
+        appLayout.style.transition = 'none';
+        mainMenubar.style.transition = 'none';
 
-        // Clear previous simple listeners if any, to avoid multiple bindings
-        desktopTocElement.querySelectorAll('a').forEach(link => {
-            // A bit hacky to remove/re-add, ideally use a flag or more robust event management
-            const newLink = link.cloneNode(true);
-            link.parentNode.replaceChild(newLink, link);
-        });
-        
-        const currentTocLinks = desktopTocElement.querySelectorAll('a');
+        menuToggleBtn.setAttribute('aria-expanded', 'false');
+        appLayout.classList.remove('menubar-open');
 
-        if (window.innerWidth < DESKTOP_BREAKPOINT) {
-            // Mobile Mode: TOC links should close the menu instantly.
-            currentTocLinks.forEach(link => {
-                link.addEventListener('click', function(event) {
-                    const isMenuOpen = appLayout.classList.contains('menubar-open');
+        void appLayout.offsetHeight; 
+        void mainMenubar.offsetHeight;
 
-                    if (isMenuOpen) { 
-                        const href = link.getAttribute('href');
-                        event.preventDefault(); 
+        appLayout.style.transition = originalAppLayoutTransition;
+        mainMenubar.style.transition = originalMenubarTransition;
+    }
 
-                        // Temporarily disable transitions for an instant close
-                        const originalAppLayoutTransition = appLayout.style.transition;
-                        const originalMenubarTransition = mainMenubar.style.transition;
-                        appLayout.style.transition = 'none';
-                        mainMenubar.style.transition = 'none';
-
-                        menuToggleBtn.setAttribute('aria-expanded', 'false');
-                        appLayout.classList.remove('menubar-open');
-
-                        // Force reflow to apply changes without transition
-                        void appLayout.offsetHeight; 
-                        void mainMenubar.offsetHeight;
-
-                        // Restore transitions
-                        appLayout.style.transition = originalAppLayoutTransition;
-                        mainMenubar.style.transition = originalMenubarTransition;
-                        
-                        // Navigate immediately
-                        if (href && href.startsWith('#')) {
-                            window.location.hash = href;
-                        } else if (href) { 
-                            window.location.href = href;
-                        }
-                    }
-                    // If menu isn't open, default link action occurs.
-                });
-            });
+    function handleTwoPaneDesktopTocScroll(event, targetElement, targetId) {
+        if (!rightPaneScroller || !rightPaneObservedContent) {
+            console.warn("Desktop two-pane scrolling elements (rightPaneScroller or rightPaneObservedContent) not found. Letting browser attempt scroll.");
+            updateDesktopTocActiveState(targetId);
             return; 
         }
 
-        // For desktop mode (width >= DESKTOP_BREAKPOINT):
-        currentTocLinks.forEach(link => {
-            link.addEventListener('click', function(event) {
-                const targetId = this.getAttribute('href').substring(1);
-                const targetElement = document.getElementById(targetId);
+        event.preventDefault();
+        let scrolledInPane = false;
 
-                if (!targetElement) {
-                    // If target element doesn't exist, let default behavior (if any) proceed.
-                    // If this was two-pane (where we'd preventDefault), ensure hash is set as a fallback.
-                    const isDesktopSinglePane = bodyElement.classList.contains('single-pane-mode');
-                    if (!isDesktopSinglePane && targetId) { 
-                        window.location.hash = targetId;
-                    }
-                    return;
-                }
-
-                const isDesktopSinglePane = bodyElement.classList.contains('single-pane-mode');
-
-                if (isDesktopSinglePane) {
-                    // Desktop Single-Pane Mode:
-                    updateDesktopTocActiveState(targetId); // Update TOC active state immediately.
-                    // Do NOT event.preventDefault(). Let the browser change the hash and scroll.
-                    // The 'hashchange' event will fire, and handleInitialHash() will do the actual scrolling and highlighting.
-                } else {
-                    // Desktop Two-Pane Mode:
-                    // Check for necessary elements for two-pane scrolling.
-                    if (!rightPaneScroller || !rightPaneObservedContent) {
-                         console.warn("Desktop two-pane scrolling elements (rightPaneScroller or rightPaneObservedContent) not found. Letting browser attempt scroll.");
-                         updateDesktopTocActiveState(targetId); // Still update TOC.
-                         // Do not preventDefault if critical elements for two-pane scrolling are missing.
-                         // Allow native hash navigation to occur by not calling preventDefault and returning.
-                         return; 
-                    }
-
-                    event.preventDefault(); // Prevent default for manual pane scrolling.
-                    let scrolledInPane = false;
-
-                    // Attempt to scroll in right pane
-                    if (rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
-                        if (rightPaneScroller) { // Ensure rightPaneScroller is available
-                           const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
-                           rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                           scrolledInPane = true;
-                        } else {
-                             console.warn("rightPaneScroller not found for a right-pane target. Cannot scroll pane.");
-                             // Fallback: allow browser to scroll main window if pane scroller is missing
-                             event.target.ownerDocument.defaultView.location.hash = targetId; // Trigger hashchange for main window scroll
-                             updateDesktopTocActiveState(targetId);
-                             return; // Exit to avoid further actions like highlightTarget on wrong context
-                        }
-                    } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
-                        // Attempt to scroll in left pane
-                        const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
-                        leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                        scrolledInPane = true;
-                    }
-                    
-                    if (!scrolledInPane) {
-                        // Fallback: If target not in a recognized pane (e.g., element outside main layout), scroll main window.
-                        console.warn("Target element for TOC link not found in expected panes for two-pane mode. Scrolling main window as fallback.");
-                        const targetRect = targetElement.getBoundingClientRect();
-                        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                        const desiredPadding = 15; // Consistent padding from other calculations
-                        const finalScrollYFallback = targetRect.top + scrollTop - (headerHeight + desiredPadding);
-                        window.scrollTo({ top: finalScrollYFallback, behavior: 'instant' });
-                    }
-                    
-                    highlightTarget(targetElement); // Highlight after our manual scroll.
-                    updateDesktopTocActiveState(targetId);
-                    window.location.hash = targetId; // Manually update hash since we prevented default.
-                }
-            });
-        });
-
-        // IntersectionObserver setup - this is primarily for two-pane desktop
-        // It should only run if NOT in single-pane mode AND the necessary elements exist.
-        if (!bodyElement.classList.contains('single-pane-mode')) {
-            if (rightPaneScroller && rightPaneObservedContent) { // Ensure elements for observer root/targets exist
-                 const contentHeadings = Array.from(rightPaneObservedContent.querySelectorAll('h2[id], h3[id], h4[id], article[id]'));
-                 if (contentHeadings.length > 0) { // Only create observer if there's something to observe
-                    let lastVisibleTocLink = null; 
-                    tocIntersectionObserver = new IntersectionObserver(entries => {
-                        let bestVisibleEntry = null;
-                        for (const entry of entries) {
-                            if (entry.isIntersecting) {
-                                if (!bestVisibleEntry || entry.boundingClientRect.top < bestVisibleEntry.boundingClientRect.top) {
-                                    bestVisibleEntry = entry;
-                                }
-                            }
-                        }
-                        if (bestVisibleEntry) {
-                            const id = bestVisibleEntry.target.getAttribute('id');
-                            const tocLink = desktopTocElement.querySelector(\`a[href="#\${id}"]\`);
-                            if (tocLink && tocLink !== lastVisibleTocLink) {
-                                updateDesktopTocActiveState(id); 
-                                lastVisibleTocLink = tocLink;
-                            }
-                        }
-                    }, { 
-                        root: rightPaneScroller, 
-                        rootMargin: \`-\${headerHeight + 10}px 0px -75% 0px\`, 
-                        threshold: 0.01 
-                    });
-                    contentHeadings.forEach(heading => tocIntersectionObserver.observe(heading));
-                 } else {
-                    // console.log("No content headings found in right pane for IntersectionObserver.");
-                 }
+        if (rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
+            if (rightPaneScroller) {
+               const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
+               rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+               scrolledInPane = true;
             } else {
-                // console.log("rightPaneScroller or rightPaneObservedContent not found; IntersectionObserver not set up for two-pane mode.");
+                 console.warn("rightPaneScroller not found for a right-pane target. Cannot scroll pane.");
+                 if (targetId) window.location.hash = targetId; 
+                 updateDesktopTocActiveState(targetId);
+                 return; 
             }
+        } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
+            const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
+            leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+            scrolledInPane = true;
         }
-        // If in single-pane mode, any existing tocIntersectionObserver would have been disconnected at the start of setupDesktopTocInteractions.
-    }
-    
-    function handleInitialHash() {
-        updateHeaderHeightVar(); // Ensure headerHeight is current before any calculations
-        const hash = window.location.hash.substring(1);
-
-        if (!hash) {
-            return;
-        }
-        const targetElement = document.getElementById(hash);
         
+        if (!scrolledInPane) {
+            console.warn("Target element for TOC link not found in expected panes (two-pane mode). Scrolling main window as fallback.");
+            const targetRect = targetElement.getBoundingClientRect();
+            const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+            const finalScrollYFallback = targetRect.top + scrollTop - (headerHeight + 15);
+            window.scrollTo({ top: finalScrollYFallback, behavior: 'instant' });
+        }
+        
+        highlightTarget(targetElement);
+        updateDesktopTocActiveState(targetId);
+        if (targetId) window.location.hash = targetId;
+    }
+
+    function scrollToTargetInSinglePaneOrMobile(targetElement, hash, isSinglePane, isDesktop) {
+        targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
+        // scroll-margin-top CSS handles offset.
+        if (isSinglePane && isDesktop) { // Desktop single-pane specific update
+            updateDesktopTocActiveState(hash);
+        }
+    }
+
+    function scrollToTargetInTwoPaneDesktop(targetElement, hash) {
+        if (rightPaneScroller && rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
+            const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
+            rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+            updateDesktopTocActiveState(hash);
+        } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
+            const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
+            leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+            // No TOC update for left-pane targets usually.
+        } else { 
+            targetElement.scrollIntoView({ behavior: 'instant', block: 'start'}); // Fallback
+        }
+    }
+
+    // --- Main Logic Functions ---
+
+    function handleInitialHash() {
+        updateHeaderHeightVar();
+        const hash = window.location.hash.substring(1);
+        if (!hash) return;
+
+        const targetElement = document.getElementById(hash);
         if (!targetElement) {
             console.warn("handleInitialHash: Target element for hash '" + hash + "' not found.");
             return;
@@ -1080,39 +790,242 @@ document.addEventListener('DOMContentLoaded', () => {
         const isSinglePane = bodyElement.classList.contains('single-pane-mode');
         const isDesktop = window.innerWidth >= DESKTOP_BREAKPOINT;
 
-        if (isSinglePane || !isDesktop) { // Single pane mode OR mobile (which is already single flow)
-            targetElement.scrollIntoView({ behavior: 'instant', block: 'start' });
-            // If scrollIntoView works, next step is to adjust for header.
-            // A common, though sometimes imperfect, way after scrollIntoView:
-            // if (targetElement.getBoundingClientRect().top < (headerHeight + 15)) { // Check if it's under the header
-            //    window.scrollBy(0, -(headerHeight + 15 - targetElement.getBoundingClientRect().top));
-            // }
-            // Or, more reliably, stick to window.scrollTo with calculated offset if scrollIntoView alone isn't enough.
-
-            if (isSinglePane && isDesktop && desktopTocElement) {
-                updateDesktopTocActiveState(hash);
-            }
-        } else { // Desktop two-pane mode
-            if (rightPaneScroller && rightPaneObservedContent && targetElement.closest('#' + rightPaneObservedContent.id)) {
-                const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
-                rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-                updateDesktopTocActiveState(hash);
-            } else if (leftPaneHost && targetElement.closest('#' + leftPaneHost.id)) {
-                const scrollTopTo = getScrollTargetOffset(targetElement, leftPaneHost);
-                leftPaneHost.scrollTo({ top: scrollTopTo, behavior: 'instant' });
-            } else { 
-                targetElement.scrollIntoView({ behavior: 'instant', block: 'start'});
-            }
+        if (isSinglePane || !isDesktop) {
+            scrollToTargetInSinglePaneOrMobile(targetElement, hash, isSinglePane, isDesktop);
+        } else {
+            scrollToTargetInTwoPaneDesktop(targetElement, hash);
         }
         highlightTarget(targetElement);
     }
 
-    handleDesktopInterPaneLinking();
-    setupDesktopTocInteractions(); // Initial setup based on current mode/size
+    function setupDesktopTocInteractions() { 
+        if (tocIntersectionObserver) {
+            tocIntersectionObserver.disconnect();
+            tocIntersectionObserver = null;
+        }
+        if (!desktopTocElement) return;
+
+        desktopTocElement.querySelectorAll('a').forEach(link => {
+            const newLink = link.cloneNode(true); // Prevent multiple listeners on re-setup
+            link.parentNode.replaceChild(newLink, link);
+        });
+        
+        const currentTocLinks = desktopTocElement.querySelectorAll('a');
+
+        // Mobile mode handler
+        if (window.innerWidth < DESKTOP_BREAKPOINT) {
+            currentTocLinks.forEach(link => {
+                link.addEventListener('click', function(event) {
+                    if (appLayout && appLayout.classList.contains('menubar-open')) { 
+                        event.preventDefault();
+                        closeMenuInstantly();
+                        const href = link.getAttribute('href');
+                        if (href && href.startsWith('#')) {
+                            window.location.hash = href;
+                        } else if (href) {
+                            window.location.href = href;
+                        }
+                    }
+                });
+            });
+            return; 
+        }
+
+        // Desktop mode handler (single-pane or two-pane)
+        currentTocLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                const targetId = this.getAttribute('href').substring(1);
+                const targetElement = document.getElementById(targetId);
+
+                if (!targetElement) {
+                    const isDesktopTwoPane = !bodyElement.classList.contains('single-pane-mode');
+                    if (isDesktopTwoPane && targetId) { 
+                        window.location.hash = targetId;
+                    }
+                    return;
+                }
+
+                if (bodyElement.classList.contains('single-pane-mode')) {
+                    updateDesktopTocActiveState(targetId);
+                    // Allow default hash navigation for single-pane desktop.
+                } else {
+                    handleTwoPaneDesktopTocScroll(event, targetElement, targetId);
+                }
+            });
+        });
+
+        // IntersectionObserver for two-pane desktop
+        if (!bodyElement.classList.contains('single-pane-mode')) {
+            if (rightPaneScroller && rightPaneObservedContent) {
+                 const contentHeadings = Array.from(rightPaneObservedContent.querySelectorAll('h2[id], h3[id], h4[id], article[id]'));
+                 if (contentHeadings.length > 0) {
+                    let lastVisibleTocLink = null; 
+                    tocIntersectionObserver = new IntersectionObserver(entries => {
+                        let bestVisibleEntry = null;
+                        entries.forEach(entry => {
+                            if (entry.isIntersecting && (!bestVisibleEntry || entry.boundingClientRect.top < bestVisibleEntry.boundingClientRect.top)) {
+                                bestVisibleEntry = entry;
+                            }
+                        });
+                        if (bestVisibleEntry) {
+                            const id = bestVisibleEntry.target.getAttribute('id');
+                            if (id) { // Ensure id is not null
+                                const tocLink = desktopTocElement.querySelector(\`a[href="#\${id}"]\`);
+                                if (tocLink && tocLink !== lastVisibleTocLink) {
+                                    updateDesktopTocActiveState(id); 
+                                    lastVisibleTocLink = tocLink;
+                                }
+                            }
+                        }
+                    }, { 
+                        root: rightPaneScroller, 
+                        rootMargin: \`-\${headerHeight + 10}px 0px -75% 0px\`, 
+                        threshold: 0.01 
+                    });
+                    contentHeadings.forEach(heading => tocIntersectionObserver.observe(heading));
+                 }
+            }
+        }
+    }
     
-    // Call handleInitialHash on initial load for any existing hash
+    function applySinglePaneMode(isSinglePane) {
+        bodyElement.classList.toggle('single-pane-mode', isSinglePane);
+        if (singlePaneToggle) singlePaneToggle.checked = isSinglePane;
+        setupDesktopTocInteractions(); 
+    }
+
+    function updateURLForSinglePane(isSinglePane) {
+        const url = new URL(window.location.href);
+        if (isSinglePane) url.searchParams.set('singlePane', 'true');
+        else url.searchParams.delete('singlePane');
+        history.replaceState({}, '', url.toString());
+    }
+
+    // --- Initialization and Event Listeners ---
+
+    updateHeaderHeightVar(); // Initial call
+
+    // Single Pane Toggle Logic
+    if (singlePaneToggle) {
+        const urlParams = new URLSearchParams(window.location.search);
+        let initialSinglePane = (window.innerWidth < DESKTOP_BREAKPOINT) ? true : false; // Default for mobile/desktop
+        if (urlParams.has('singlePane')) { // Explicit param overrides default
+            initialSinglePane = urlParams.get('singlePane') === 'true';
+        }
+        applySinglePaneMode(initialSinglePane);
+
+        singlePaneToggle.addEventListener('change', (event) => {
+            applySinglePaneMode(event.target.checked);
+            updateURLForSinglePane(event.target.checked);
+        });
+    }
+
+    // Menu Toggle Logic
+    if (menuToggleBtn && appLayout) {
+        menuToggleBtn.addEventListener('click', () => {
+            const isExpanded = menuToggleBtn.getAttribute('aria-expanded') === 'true';
+            menuToggleBtn.setAttribute('aria-expanded', String(!isExpanded));
+            appLayout.classList.toggle('menubar-open');
+        });
+    }
+    
+    // Non-TOC Menu Links (Mobile Instant Close)
+    if (mainMenubar && appLayout && menuToggleBtn) {
+         mainMenubar.querySelectorAll('a:not(.desktop-toc a)').forEach(link => {
+            link.addEventListener('click', (event) => {
+                if (window.innerWidth < DESKTOP_BREAKPOINT && appLayout.classList.contains('menubar-open')) {
+                    event.preventDefault();
+                    closeMenuInstantly();
+                    const href = link.getAttribute('href');
+                    if (href) {
+                        if (href.startsWith('#')) window.location.hash = href;
+                        else window.location.href = href;
+                    }
+                }
+            });
+        });
+    }
+
+    // Copy and Share Functionality
+    document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async (event) => {
+            const buttonEl = event.target; 
+            const id = buttonEl.dataset.id;
+            const base64Text = buttonEl.dataset.text;
+            const text = atob(base64Text || '');
+            let markdownContent = "Error retrieving markdown content.";
+            const markdownHostEl = document.getElementById(\`md-\${id}\`);
+            if (markdownHostEl) markdownContent = atob(markdownHostEl.textContent || '');
+            else console.error(\`Markdown host element not found: #md-\${id}\`);
+            
+            const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
+            const copyText = \`\${text}\n\${url}\n\n\${markdownContent}\`;
+            try {
+                await navigator.clipboard.writeText(copyText);
+                buttonEl.textContent = 'Copied!';
+            } catch (err) {
+                console.error('Failed to copy: ', err);
+                buttonEl.textContent = 'Error';
+            }
+            setTimeout(() => { buttonEl.textContent = 'Copy'; }, 2000);
+        });
+    });
+
+    if (navigator.share) {
+        document.querySelectorAll('.share-btn').forEach(button => {
+            button.style.display = 'inline-block';
+            button.addEventListener('click', async (event) => {
+                const buttonEl = event.target;
+                const id = buttonEl.dataset.id;
+                const text = atob(buttonEl.dataset.text || '');
+                const url = \`\${window.location.origin}\${window.location.pathname}#\${id}\`;
+                try {
+                    await navigator.share({ title: text, text: \`Check out this section: \${text}\`, url });
+                } catch (err) { console.error('Error sharing: ', err); }
+            });
+        });
+    }
+    
+    // Inter-Pane Linking (from RFI letter to Principles/Recs)
+    function handleDesktopInterPaneLinking() { 
+        if (!rightPaneScroller) return; // Needed for two-pane scrolling target
+        document.querySelectorAll('a.internal-link[data-target-pane-item]').forEach(link => {
+            link.addEventListener('click', function(event) {
+                const targetId = this.dataset.targetPaneItem;
+                const targetElement = targetId ? document.getElementById(targetId) : null;
+
+                if (bodyElement.classList.contains('single-pane-mode')) { // Single-pane: use hash nav
+                    event.preventDefault();
+                    const sourceElement = this.closest('article[id], div.recommendation-category[id]');
+                    const sourceId = sourceElement ? sourceElement.id : null;
+                    if (sourceId && sourceId !== targetId && sourceId !== window.location.hash.substring(1)) {
+                        history.pushState(null, "", "#" + sourceId);
+                    }
+                    if (targetId) window.location.hash = targetId; // Triggers handleInitialHash
+                } else if (window.innerWidth >= DESKTOP_BREAKPOINT) { // Desktop two-pane
+                    event.preventDefault();
+                    if (targetElement && rightPaneScroller) { 
+                        const scrollTopTo = getScrollTargetOffset(targetElement, rightPaneScroller);
+                        rightPaneScroller.scrollTo({ top: scrollTopTo, behavior: 'instant' });
+                        highlightTarget(targetElement);
+                        updateDesktopTocActiveState(targetId);
+                        if (targetId) window.location.hash = targetId;
+                    } else {
+                        console.warn('Inter-pane link target or scroller not found: ' + targetId);
+                        if (this.getAttribute('href')) window.location.hash = this.getAttribute('href'); 
+                    }
+                }
+                // Mobile two-pane (flex-column) or other fallbacks: allow default hash navigation.
+            });
+        });
+    }
+    handleDesktopInterPaneLinking();
+
+    // Initial setups
+    setupDesktopTocInteractions(); 
     handleInitialHash(); 
 
+    // Event Listeners
     window.addEventListener('hashchange', () => {
         console.log('[HashListener] hashchange event fired. New hash:', window.location.hash);
         handleInitialHash();
@@ -1122,18 +1035,11 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimeout);
         resizeTimeout = setTimeout(() => {
-            updateHeaderHeightVar(); // Recalculate header height
-            setupDesktopTocInteractions(); // Re-evaluate TOC interactions
-            
-            // Menubar state on resize (existing logic)
-            if (window.innerWidth >= DESKTOP_BREAKPOINT) {
-                // No specific action needed for menubar itself, CSS handles width.
-            } else { // Resizing to mobile
-                if (appLayout.classList.contains('menubar-open')) {
-                    menuToggleBtn.setAttribute('aria-expanded', 'true');
-                } else {
-                    menuToggleBtn.setAttribute('aria-expanded', 'false');
-                }
+            updateHeaderHeightVar();
+            setupDesktopTocInteractions(); // Re-evaluates mobile/desktop logic for TOC
+            // Menubar state on resize (mobile specific)
+            if (window.innerWidth < DESKTOP_BREAKPOINT && menuToggleBtn && appLayout) {
+                menuToggleBtn.setAttribute('aria-expanded', String(appLayout.classList.contains('menubar-open')));
             }
         }, 250);
     });
