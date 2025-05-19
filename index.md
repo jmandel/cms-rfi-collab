@@ -351,7 +351,7 @@ Direct patient access via certified EHR FHIR APIs remains crucial, especially if
 **d. How would encouraging the use of CSPs improve access to health information?**
 **e. What role should CMS/payers, providers, and app developers have in driving adoption?**
 
-Wider use of high-assurance digital identity is key to simplifying and securing patient access.
+Wider use of high-assurance digital identity is key to simplifying and securing patient access. However, identity credentials alone are insufficient without robust, bound authorization credentials that specify what data an identified user is permitted to access and for what purpose. We expand on this in our recommendation for a [Trustworthy and Accountable Architecture for All TEFCA Individual Access Services](#req_tefca_trustworthy_ias_architecture).
 
 #### Guiding Principle:
 *   [Patient Primacy and Empowerment](#principle_patient_primacy)
