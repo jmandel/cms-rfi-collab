@@ -1,5 +1,5 @@
 import { Marked } from 'marked';
-import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync, mkdirSync, copyFileSync } from 'fs';
 import path from 'path';
 
 // These constants should be at the top level of the script
@@ -289,13 +289,23 @@ async function generateSite() {
       const filename = path.join(OUTPUT_DIR, `${id}.html`);
       // Correct HTML entity sanitization for the title
       const pageTitle = title.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>');
-      const itemHtmlContent = await marked.parse(markdownToParse);
+      let itemHtmlContent = await marked.parse(markdownToParse);
 
-      // For meta refresh and fallback link, use a simple relative path to index.html + hash.
-      // This works because [slug].html and index.html are in the same 'dist' directory.
-      // const nonJsFallbackUrl = `index.html#${id}`; 
-      // const metaRefreshTag = `<meta http-equiv="refresh" content="0; url=${nonJsFallbackUrl}">`;
-      // const fallbackLinkHref = nonJsFallbackUrl;
+      let ogImageMetaTag = '';
+      let imageEmbedHtml = '';
+      const imageSrcPath = path.join('images', `${id}.png`);
+      const imageDestDir = path.join(OUTPUT_DIR, 'images');
+      const imageDestPath = path.join(imageDestDir, `${id}.png`);
+
+      if (existsSync(imageSrcPath)) {
+        if (!existsSync(imageDestDir)) {
+          mkdirSync(imageDestDir, { recursive: true });
+        }
+        copyFileSync(imageSrcPath, imageDestPath);
+        // The content path for the meta tag should be relative to the HTML file in the dist directory
+        ogImageMetaTag = `<meta property="og:image" content="images/${id}.png">`;
+        imageEmbedHtml = `<p><img src="images/${id}.png" alt="${pageTitle}" style="max-width: 100%; height: auto; margin-top: 1em;"></p>`;
+      }
 
       // New JavaScript redirect logic
       const jsRedirectLogic = `
@@ -317,7 +327,7 @@ async function generateSite() {
 <head>
   <meta charset="UTF-8">
   <title>${pageTitle}</title>
-  
+  ${ogImageMetaTag}
   ${redirectScriptTag}
   <style>
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; margin: 2em; line-height: 1.6; color: #333; }
@@ -336,6 +346,7 @@ async function generateSite() {
 <body>
   <h1>${pageTitle}</h1>
   ${itemHtmlContent}
+  ${imageEmbedHtml}
 </body>
 </html>`;
       writeFileSync(filename, individualPageHtml);
