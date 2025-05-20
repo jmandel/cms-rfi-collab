@@ -186,20 +186,34 @@ The fundamental goal is to make secure, online patient portal account creation a
 ## TEFCA and Health Information Networks Must Prioritize Individual Rights, Security, and Access
 
 ### Empower Individuals with Transparency and Control Over TEFCA Data Sharing | `req_tefca_individual_transparency_control`
-**Recommendation:** ONC must ensure, through proactive engagement with the RCE and evolution of the TEFCA Common Agreement and QTF, that individuals have clear visibility into how their data is used within the TEFCA network and possess robust mechanisms, **managed at the network or QHIN level,** to control its sharing.
-**Rationale & Specifics:** Building public trust in TEFCA requires empowering individuals with direct oversight and control. QHINs and participating Health IT systems must support:
-1.  **Patient-Accessible Network Audit Logs:** QHINs must provide a standardized, secure, cost-free, human-readable, and API-accessible method for individuals to obtain an audit log of queries for their data across the TEFCA network that were facilitated by that QHIN.
-2.  **Network-Level Patient Sharing Controls:** Individuals must be able to manage their TEFCA data sharing preferences through a centralized mechanism or via their chosen QHIN's interface. These controls, once set, apply to TEFCA network participants. QHINs, through TEFCA mechanisms, must support:
-    *   **Network-Wide or QHIN-Specific Opt-Out:** Allowing individuals to opt out of their data being shared via the TEFCA network entirely, or with specific QHINs.
-    *   **"Ask Me First" for Query Approval:** An option for individuals to require their explicit, real-time (or near real-time) consent via a notification from their QHIN or a designated service before their data is released in response to specific TEFCA queries (especially for non-treatment purposes).
-    *   **"Freeze Access" Capability:** A mechanism for individuals to (reversibly) block all TEFCA network queries for their data. This freeze would be registered at the network/QHIN level and honored by all participants attempting to query for that individual's data via TEFCA.
-3.  **Opt-In Network Access Notifications:** QHINs should offer opt-in notifications to individuals regarding TEFCA network access to their health records (which could also serve as the trigger for "Ask Me First" approvals).
-4.  **Certified Health IT Support for Honoring Network-Level Patient Preferences and Relaying Local Audit Information:**
-    *   **Recommendation:** The ONC Health IT Certification Program should include criteria requiring certified Health IT (used by TEFCA participants) to be capable of receiving, interpreting, and **honoring patient sharing preferences (e.g., opt-out, freeze, consent directives for "Ask Me First") that are communicated to them by the TEFCA network or QHINs** as a result of centrally managed patient choices. Furthermore, certified Health IT must securely relay necessary TEFCA query-related audit log information that the EHR system generates or receives locally back to the patient or their authorized application.
-    *   **Rationale:** For TEFCA patient controls to be effective end-to-end, EHR systems at the point of data holding must be able to act upon these network-communicated patient preferences and provide patients with a comprehensive view of access, including activity logged locally.
+
+**Recommendation:**
+ONC must ensure, through proactive engagement with the RCE and evolution of the TEFCA Common Agreement, Qualified Health Information Network Technical Framework (QTF), and associated Standard Operating Procedures (SOPs), that individuals have clear visibility into how their data is used within the TEFCA network. Individuals must have robust mechanisms to control its sharing, managed through TEFCA-designated services that ensure network-wide applicability of preferences and provide patient-centric, privacy-preserving access to consolidated audit information.
+
+**Rationale & Specifics:**
+Building public trust in TEFCA requires empowering individuals with direct oversight and control. The TEFCA framework, its participating QHINs, and connected Health IT systems must support the following:
+
+1.  **TEFCA-level Patient Sharing Controls and Notifications via Discoverable Interfaces:**
+    *   Individuals must be able to manage their TEFCA data sharing preferences and notification settings through **at least one clearly designated and easily accessible central point of interaction** provided or facilitated by the TEFCA network.
+    *   QHINs may also offer their own interfaces for managing these preferences, provided they are compatible with and reflect the authoritative settings managed via the TEFCA network-level mechanism.
+    *   These controls and notification preferences, once set through a TEFCA-recognized interface, must be propagated and honored by all TEFCA network participants. Supported controls must include:
+        *   **"Freeze Access" Capability:** A mechanism for individuals to (reversibly) block all TEFCA network data disclosures for their data. This freeze would be registered via the TEFCA network preference service and honored by all participants attempting to retrieve data for that individual via TEFCA.
+        *   **"Ask Me First" for Query Approval/Disclosure:** An option for individuals to require their explicit, real-time (or near real-time) consent via a notification (e.g., from their chosen QHIN or a TEFCA-designated service) before their data is released in response to specific TEFCA queries, especially for non-treatment purposes or other sensitive exchanges as defined by the individual or TEFCA policy.
+        *   **Opt-In Network Access Notifications:** QHINs or TEFCA-designated services should offer opt-in notifications to individuals regarding TEFCA network access attempts or disclosures of their health records, which could also serve as the trigger for "Ask Me First" approvals.
+
+2.  **Patient-Accessible, Consolidated Network Audit Logs:**
+    *   The TEFCA network, potentially via the RCE or a designated entity, must provide or facilitate a standardized, secure, cost-free, human-readable, and API-accessible method for individuals to obtain a **consolidated audit log** of TEFCA-related activity, potentially accessible via the same interfaces used for managing sharing preferences.
+    *   This log must reflect queries for their data and data disclosures across the TEFCA network, incorporating relevant audit information from QHINs and from participating data holders (e.g., EHR systems) regarding TEFCA-facilitated exchanges.
+    *   The architecture for providing this consolidated view must prioritize individual privacy and data minimization. This can be achieved by TEFCA-designated services querying distributed audit logs maintained by participants (QHINs and data holders) in real-time or near real-time upon an authenticated patient's request, assembling a temporary, consolidated view for the individual, rather than creating a permanent, centralized repository of all log details.
+
+3.  **Certified Health IT Support for Honoring Network-Level Patient Preferences and Enabling Network Audit Log Access:**
+    *   **Recommendation:** The ONC Health IT Certification Program must include criteria requiring certified Health IT (used by TEFCA Participants/Subparticipants) to be capable of:
+        *   Receiving, interpreting, and honoring patient sharing preferences (e.g., freeze, consent directives for "Ask Me First") that are communicated to them by TEFCA-designated preference management services.
+        *   Securely responding to authorized audit log queries, initiated on behalf of a patient, by providing relevant local audit event data concerning TEFCA-facilitated exchanges.
+    *   **Rationale:** For TEFCA patient controls to be effective end-to-end, and for audit trails to be comprehensive and trustworthy for the patient, EHR systems at the point of data holding must act upon network-communicated patient preferences and enable their local TEFCA-related transaction data to be included in the patient's consolidated network audit view.
     *   **Specifics for EHR Certification:**
-        *   **Consumption and Honoring of Network-Communicated Patient Preferences:** Certified Health IT must be capable of receiving standardized signals or data from the TEFCA network/QHINs indicating an individual’s sharing preferences (such as "do not disclose due to freeze/opt-out" or "awaiting patient consent for this query type") and appropriately acting upon these signals by, for example, withholding data or awaiting further network instruction.
-        *   **Relay of Local TEFCA-Related Audit Information to Patient:** Certified Health IT must be able to securely provide to the patient (or their authorized app) any TEFCA query-related audit log information that the EHR system itself generates or receives locally (e.g., logs of data released in response to a TEFCA query, or logs of queries that were blocked due to a patient preference), complementing the network-level audit logs provided by QHINs.
+        *   **Consumption and Honoring of Network-Communicated Patient Preferences:** Certified Health IT must be capable of subscribing to, receiving standardized signals or data from, and acting upon instructions from TEFCA-designated preference management services. This includes appropriately withholding data or awaiting further network instruction based on an individual’s active sharing preferences.
+        *   **Responding to Authorized Audit Log Queries:** Certified Health IT must implement a standardized, secure API endpoint to receive and process authorized audit log queries. These queries, authenticated as being on behalf of a specific patient, would originate from TEFCA-designated services responsible for consolidating patient audit views, or potentially from other TEFCA-authorized client applications acting for the patient. Upon such a query, the EHR must return relevant local audit event data regarding TEFCA-facilitated exchanges for that patient.
 
 ### Establish a "TEFCA Patient-Developer Credential" for Comprehensive, Direct Data Access | `req_tefca_patient_developer_credential`
 
@@ -289,16 +303,16 @@ CMS's primary role should be to ensure foundational data access and protect pati
 *   [Open Innovation and Individual Participation](#principle_open_innovation_individual_participation): Support innovation from all sources, including AI-enabled individual development.
 *   [Fostering Competition Through Open and Fair Market Foundations](#principle_market_competition_foundations): Focus on enabling access, not picking winners.
 
-#### Recommendations to encourage interest and adoption by ensuring robust and trustworthy data access:
+#### Recommendations to encourage interest and adoption by ensuring robust and trustworthy data access and functionality:
 *   [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat)
 *   [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert)
 *   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access)
 *   [Establish a "TEFCA Patient-Developer Credential" for Comprehensive, Direct Data Access](#req_tefca_patient_developer_credential): This enables individual innovation by lowering access barriers.
 *   [Empower Individuals with Transparency and Control Over TEFCA Data Sharing](#req_tefca_individual_transparency_control): Builds trust necessary for engagement.
 *   [Ensure Patient Access to Remote, High-Assurance Portal Account Provisioning](#req_coordinated_remote_provisioning_access): Simplifies foundational access.
+*   [Mandate Electronic Pathways for Patient Record Amendment Requests](#req_patient_amendment_pathways): Allowing patients to easily request corrections to their data via portals and apps makes digital tools more empowering and essential.
 
-CMS should avoid becoming an app "approver" for general health tools, which could stifle innovation. Focus on open, secure, comprehensive data pipes, allowing the market and patients to determine value.
-
+CMS should avoid becoming an app "approver" for general health tools, which could stifle innovation. Focus on open, secure, comprehensive data pipes and core functionalities, allowing the market and patients to determine value.
 ### PC-8. In your experience, what health data is readily available and valuable to patients or their caregivers or both?
 
 While basic structured data (USCDI) is increasingly available, much of the richest data remains difficult to access programmatically.
@@ -508,17 +522,21 @@ We need **both**: expanding standardized USCDI and API access to complete EHI (i
 
 ### TD-10. For EHR and other developers subject to the ONC Health IT Certification Program, what further steps should ASTP/ONC consider to implement the 21st Century Cures Act's API condition of certification (42 U.S.C. 300jj-11(c)(5)(D)(iv)) that requires a developer's APIs to allow health information to be accessed, exchanged, and used without special effort, including providing access to all data elements of a patient's electronic health record to the extent permissible under applicable privacy laws?
 
-The most critical step is to mandate robust, API-accessible, and computable full EHI export.
+The Cures Act's vision of data being accessed, exchanged, and used "without special effort" extends beyond simple retrieval. It encompasses the full lifecycle of patient interaction with their data, including ensuring its accuracy and completeness.
 
 #### Guiding Principle:
+*   [Patient Primacy and Empowerment](#principle_patient_primacy)
 *   [Comprehensive and Performant Data Access](#principle_comprehensive_performant_data_access)
 
 #### Primary Technology Policy Recommendation:
 *   [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat): This is precisely designed to fulfill the Cures Act's "all data elements... without special effort" provision by requiring API accessibility, inclusion of all EHI, and computability via vendor documentation.
 
-#### Other Supporting Recommendations ensuring "without special effort":
-*   [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert)
-*   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access)
+#### Further Supporting Recommendations ensuring "without special effort" for access and use:
+*   [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert): Ensures modern, secure, and functional single-patient API access.
+*   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access): Makes critical image data accessible without special effort.
+*   [Mandate Electronic Pathways for Patient Record Amendment Requests](#req_patient_amendment_pathways): Fulfilling the HIPAA right to request amendment "without special effort" is a crucial aspect of "using" one's health information. Current manual processes create significant burdens. Mandating certified electronic pathways (via portals and APIs) for patients to submit, track, and receive responses to amendment requests directly aligns with the Cures Act's intent to empower patients and improve data quality.
+
+By mandating these capabilities through the ONC Health IT Certification Program, ONC can ensure that "without special effort" becomes a practical reality for patients seeking to truly engage with and manage their complete health information.
 
 ### TD-11. As of January 1, 2024, many health IT developers with products certified through the ONC Health IT Certification Program are required to include the capability to perform an electronic health information export or “EHI export” for a single patient as well as for patient populations (45 CFR 170.315(b)(10))...
 **a. Should this capability be revised to specify standardized API requirements for EHI export?**
