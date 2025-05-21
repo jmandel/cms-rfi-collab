@@ -27,7 +27,7 @@ To foster a competitive and innovative health IT market, foundational infrastruc
 
 ## EHR Certification Program Ensures Foundational Product Functionality
 
-### Steward USCDI Development for Meaningful Interoperability | `req_steward_uscdi_development`
+### Steward USCDI Development for Pragmatic Interoperability | `req_steward_uscdi_development`
 **Recommendation:**
 ONC must lead an improved, evidence-based USCDI development and adoption process to ensure that an expanding set of meaningfully standardized and clinically relevant patient data elements is defined. This enhanced USCDI will serve as the common data foundation for all mandated FHIR-based APIs.
 
@@ -291,7 +291,7 @@ Achieving comprehensive access is fundamental and is directly supported by sever
 *   [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat): This is crucial for patients to obtain *all* their EHI via API, including notes and images, enabling truly comprehensive personal health records.
 *   [Mandate Self-Service Electronic EHI Request Functionality in Certified Health IT](#req_self_service_ehi_request): Provides a baseline electronic, self-service method for patients to request their full EHI.
 *   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access): Addresses the common unavailability of diagnostic images via patient-facing APIs.
-*   [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development): Ensures an expanding common data foundation of standardized elements.
+*   [Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development): Ensures an expanding common data foundation of standardized elements.
 *   [Establish a "TEFCA Patient-Developer Credential" for Comprehensive, Direct Data Access](#req_tefca_patient_developer_credential): Empowers individuals to use tools to aggregate their own data from various sources.
 
 
@@ -326,7 +326,7 @@ While basic structured data (USCDI) is increasingly available, much of the riche
 *   Medicare claims data via Blue Button 2.0.
 
 #### Valuable but Hard to Access (PC-8a):
-Making the following valuable data types more accessible programmatically is crucial. Many of these challenges can be significantly addressed by two overarching recommendations: ensuring comprehensive data availability via [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat) and by expanding standardized data elements through [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development). Specific data types include:
+Making the following valuable data types more accessible programmatically is crucial. Many of these challenges can be significantly addressed by two overarching recommendations: ensuring comprehensive data availability via [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat) and by expanding standardized data elements through [Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development). Specific data types include:
 
 *   **Diagnostic quality medical images:** Critical but rarely API-accessible (though imaging reports may sometimes be available, the images themselves are harder to obtain programmatically). This is primarily solved by [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access), and also supported by the EHI export.
 *   **Full flowsheet data:** Comprehensive view of patient status and interventions. Addressed by EHI export and potentially USCDI expansion.
@@ -509,14 +509,14 @@ USCDI is a valuable baseline but limited in scope and granularity.
 *   [Comprehensive and Performant Data Access](#principle_comprehensive_performant_data_access)
 
 #### Technology Policy Recommendations:
-*   [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development): Advocate for an improved, evidence-based expansion of USCDI.
+*   [Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development): Advocate for an improved, evidence-based expansion of USCDI.
 *   [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat): Serves as the crucial backstop for data beyond USCDI.
 
 #### Limitations (TD-7a, TD-7b):
 Primarily scope; USCDI is intentionally a "core" set.
 
 #### Adding More Data Elements to USCDI (TD-7c):
-Yes, thoughtfully adding more elements via the process in [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development) adds value. Address scoping via iterative expansion and clear value propositions.
+Yes, thoughtfully adding more elements via the process in [Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development) adds value. Address scoping via iterative expansion and clear value propositions.
 
 #### Less Structured Formats and LLMs (TD-7d):
 We need **both**: expanding standardized USCDI and API access to complete EHI (including less structured data) via [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat). LLMs can process the unstructured parts of EHI, while standardized USCDI remains vital for precision tasks.
@@ -580,7 +580,7 @@ VBC success depends on timely, comprehensive data access, robust analytics, and 
 *   **Efficient Data Extraction/Aggregation:** [Keep Bulk Data API Certification Current with FHIR Bulk Data Specifications](#req_update_bulk_data_cert), [Ensure Foundational Design and Performance for Bulk Data API](#req_ensure_bulk_api_performance_parity), and [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat).
 *   **Timely Patient Event Notifications:** [Mandate FHIR Subscriptions for Event-Driven Workflows](#req_mandate_fhir_subscriptions).
 *   **Advanced CDS/Workflow Integration:** [Mandate CDS Hooks for Seamless Clinical Decision Support Integration](#req_mandate_cds_hooks).
-*   **Comprehensive Data for Quality Measurement:** [Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development) and Bulk FHIR capabilities.
+*   **Comprehensive Data for Quality Measurement:** [Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development) and Bulk FHIR capabilities.
 *   **Enhanced Patient Engagement:** Patient data access through [Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat) and [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert).
 *   **Nationwide Data Discovery:** [Establish Public Foundational Infrastructure for Nationwide Discovery](#req_public_discovery_infrastructure) and a reformed TEFCA (e.g., per [Empower Individuals with Transparency and Control Over TEFCA Data Sharing](#req_tefca_individual_transparency_control)).
 
@@ -608,7 +608,7 @@ Several recommendations within this document are particularly pertinent for majo
 
 1.  **[Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications](#req_api_ehi_export_argonuat):**
     *   **Relevance:** Foundational for enabling advanced analytics, AI/ML applications, and patient-centric tools that rely on comprehensive, computable data. Cloud platforms are ideal for hosting and processing such large-scale EHI.
-2.  **[Steward USCDI Development for Meaningful Interoperability](#req_steward_uscdi_development):**
+2.  **[Steward USCDI Development for Pragmatic Interoperability](#req_steward_uscdi_development):**
     *   **Relevance:** Expanded and well-defined standardized data elements (USCDI) simplify data integration, improve data quality for AI, and reduce the burden on developers building cross-platform solutions.
 3.  **[Keep Bulk Data API Certification Current with FHIR Bulk Data Specifications](#req_update_bulk_data_cert) & [Ensure Foundational Design and Performance for Bulk Data API](#req_ensure_bulk_api_performance_parity):**
     *   **Relevance:** Efficient, performant, and standardized bulk data access is critical for population health analytics, research, and training AI models at scale—all key workloads for cloud health data platforms.
