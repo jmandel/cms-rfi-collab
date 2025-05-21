@@ -152,7 +152,7 @@ Integrating evidence-based guidance and advanced analytics at the point of care 
 **Recommendation:**
 Certified Health IT must provide programmatic and automatable API access to diagnostic quality medical images, using consistent, standardized authorization flows and ensuring images are shareable and usable by authorized applications.
 **Rationale & Specifics:**
-Medical images are critical clinical data, yet their accessibility via APIs has lagged.
+Medical images are critical clinical data, yet their accessibility via APIs has lagged. EHRs could certify to these capabilities by integrating with an underlying Picture Archiving and Communication System (PACS) as long as all the configuration was in place to make the user and app experience seamless; EHRs are not required to directly store and manage detailed study metadata and raw imaging data, as long as they allow seamless access alongside other clinical data.
 1.  **Standardized API Access:** Access should be facilitated via standardized APIs (e.g., DICOMweb for image retrieval) referenced from FHIR resources (e.g., an ImagingStudy resource containing DICOMweb endpoints).
 2.  **Consistent Authorization:** Image access must use the same SMART on FHIR authorization mechanisms as used for other clinical data, ensuring a consistent security model for applications.
 3.  **Avoidance of Non-Programmatic "Links":** The requirement is for truly programmatic access, not just "imaging links" within a portal that may be context-bound, require manual user interaction to dereference, or are not shareable with third-party applications.
