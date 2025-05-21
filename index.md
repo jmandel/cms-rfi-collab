@@ -423,7 +423,7 @@ These limitations hinder payer participation; a member-trusted TEFCA is more val
 
 ### PA-4. What would be the value to payers of a nationwide provider directory that included FHIR end points and used digital identity credentials?
 
-A nationwide provider directory with FHIR endpoints and identity credential information would be immensely valuable to payers.
+A nationwide provider directory with FHIR endpoints that included provider credentialing informtaion (e.g. signed digital assertions about the states in which a provider is licensed to practice) would be immensely valuable to payers.
 
 #### Guiding Principle:
 *   [Fostering Competition Through Open and Fair Market Foundations](#principle_market_competition_foundations)
