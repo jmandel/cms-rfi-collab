@@ -1,18 +1,16 @@
 # Guiding Principles
 
 ### Patient Primacy and Empowerment | `principle_patient_primacy`
-The individual is a primary stakeholder. All systems, regulations, and network designs must support the indivudial's right to easily access, understand, correct, control, and use their complete health data, free of charge.
+The individual is a primary stakeholder. All systems, regulations, and network designs must support the individual's right to easily access, understand, correct, control, and use their complete health data, free of charge.
 
 ### Comprehensive and Performant Data Access | `principle_comprehensive_performant_data_access`
 All authorized users and their designated tools and applications must have pervasive, timely, and efficient access to both standardized data (e.g., USCDI via individual and bulk FHIR APIs) and to complete, computable Electronic Health Information (EHI via API) as a foundational backstop. Usability and performance of these access methods are paramount.
 
 ### Open Innovation and Individual Participation | `principle_open_innovation_individual_participation`
-The ecosystem must actively support innovation from all sources, including individual patients developing or choosing their own tools to access and manage their own data. Barriers to entry for good-faith individual participation must be eliminated, ensuring pathways that do not require commercial-grade registration for individuals developing tools and applications for their own use.
-
- (TODO: Note that with currrent and near-future AI, the ability for individuals to "scratch their own itch" in this way is rapidly growing, and our data access frameworks must antiicpate and support this.)
+The ecosystem must actively support innovation from all sources, including individual patients developing or choosing their own tools to access and manage their own data. Barriers to entry for good-faith individual participation must be eliminated, ensuring pathways that do not require commercial-grade registration for individuals developing tools and applications for their own use. Our data access frameworks must anticipate and support the rapidly growing ability for individuals to "scratch their own itch," especially as current and near-future AI enables new forms of personal tool development.
 
 ### Transparent and Accountable Networks with Federal Oversight | `principle_tefca_oversight_accountability`
-National-scale exchange frameworks like TEFCA, and their participating entities (like QHINs and health systems), must evolve under federal guidance to ensure individual transparency (e.g., clear pathways for indivudals to access network audit logs revealing usage of their own data) and granular control (e.g., consent, opt-out). The Federal government should actively steer TEFCA's evolution to incorporate these as core, non-negotiable design tenets.
+National-scale exchange frameworks like TEFCA, and their participating entities (like QHINs and health systems), must evolve under federal guidance to ensure individual transparency (e.g., clear pathways for individuals to access network audit logs revealing usage of their own data) and granular control (e.g., consent, opt-out). The Federal government should actively steer TEFCA's evolution to incorporate these as core, non-negotiable design tenets.
 
 ### Fostering Competition Through Open and Fair Market Foundations | `principle_market_competition_foundations`
 
@@ -234,7 +232,7 @@ To fully empower individuals, foster grassroots innovation, and ensure patients 
     *   **Mandatory QHIN Recognition & Fee Exemption:** All TEFCA QHINs must recognize valid Patient-Developer Credentials and not charge individuals or their apps network access fees for this personal use.
 3.  **Facilitating Direct EHR FHIR API Access for Patient-Developers:**
     *   **EHR Recognition of Patient-Developer Context:** The TEFCA framework (or related ONC certification criteria for TEFCA participants) should ensure that EHR systems of TEFCA participants are capable of recognizing a context or assertion associated with the Patient-Developer Credential (or a derivative token) to streamline app registration for direct EHR FHIR API access for that specific patient's data.
-    *   **Simplified EHR Dynamic Registration Pathway:** For applications presenting evidence of being operated by a patient for their own data (potentially signaled via the Patient-Developer Credential context), EHRs supporting dynamic registration must offer a simplified pathway. This could involve accepting specific assertions or self-attestations for app identity in lieu of more complex commercial registration requirements, enabling individual/hobbyist app development for personal data access directly from an EHR's FHIR API (`req_dynamic_reg_self_signed` is achieved through this mechanism).
+    *   **Simplified EHR Dynamic Registration Pathway:** For applications presenting evidence of being operated by a patient for their own data (potentially signaled via the Patient-Developer Credential context), EHRs supporting dynamic registration must offer a simplified pathway. This could involve accepting specific assertions or self-attestations for app identity in lieu of more complex commercial registration requirements, enabling individual/hobbyist app development for personal data access directly from an EHR's FHIR API is achieved through this mechanism).
     *   **No Prohibitive EHR Registration Fees for Personal Use:** This simplified pathway for patient-developers accessing their own data directly from an EHR should not involve prohibitive registration or certification fees from the EHR vendor.
 4.  **Clear Distinction from Commercial Pathways:** This entire Patient-Developer Credential pathway is explicitly for individual, non-commercial use by patients developing tools for their own data. It does not replace or alter requirements for commercial IAS providers or other applications operating at scale or for multiple users.
 
@@ -254,7 +252,7 @@ Protecting patient data shared via any individual access pathway within TEFCA re
     *   Such "patient-controlled storage" IAS providers, when authorized by an individual to retrieve data on their behalf, should not be mandated to become queryable TEFCA network nodes themselves or to make the retrieved data available for reciprocal sharing via TEFCA. Their role is to facilitate the patient's right to access and personally hold their data, respecting a patient's choice to keep that consolidated data private and outside of further network exchange, unless explicitly re-authorized by the patient for a different purpose.
 5.  **Facilitation of Individual Data Retrieval within this Architecture:** Within this trustworthy and flexible framework, QHINs must provide or ensure individuals have access to functionalities enabling them to:
     *   Discover which TEFCA participants are likely to hold their records (Record Locator Service - RLS), via user-friendly interfaces (website and API).
-    *   Initiate cost-free queries for their *own* USCDI data (and eventually their full Electronic Health Information, as per `req_api_ehi_as_tefca_source`) from all participating data holders via TEFCA.
+    *   Initiate cost-free queries for their *own* USCDI data (and eventually their full Electronic Health Information) from all participating data holders via TEFCA.
 
 ### Establish Public Foundational Infrastructure for Nationwide Discovery | `req_public_discovery_infrastructure`
 **Recommendation:** ONC should lead or actively support the establishment, maintenance, and governance of publicly available, free, and machine-readable national directory services crucial for enabling nationwide health information exchange and interoperability.
