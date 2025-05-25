@@ -239,20 +239,37 @@ To fully empower individuals, foster grassroots innovation, and ensure patients 
 ### Mandate a Trustworthy and Accountable Architecture for All TEFCA Individual Access Services (IAS) | `req_tefca_trustworthy_ias_architecture`
 
 **Recommendation:**
-The TEFCA Common Agreement and QTF must mandate a high-assurance security and authorization architecture for all Individual Access Services (whether commercial IAS providers or services facilitating the Patient-Developer Credential). This architecture must ensure that applications accessing data on behalf of an individual do so based on explicit, verifiable individual consent, mediated by a narrow set of trusted identity and authorization service providers, with strong cryptographic binding between identity and authorization.
+The TEFCA Common Agreement and QTF must mandate a high-assurance security and authorization architecture for all Individual Access Services (whether commercial IAS providers or services facilitating the Patient-Developer Credential). This architecture must ensure that applications accessing data on behalf of an individual do so based on explicit, verifiable individual consent, mediated by a narrow set of trusted identity and authorization service providers, with verifiable binding between identity and authorization.
 
 **Rationale & Specifics:**
 Protecting patient data shared via any individual access pathway within TEFCA requires a robust, standardized architecture that clearly separates roles and ensures accountability. This model prevents applications from self-attesting permissions and helps limit the potential impact of a compromised application.
 
-1.  **Federated Trust with Approved Identity Providers (IdPs) for All IAS:** All Individual Access Service pathways, including those used by commercial providers and those facilitating the Patient-Developer Credential, must rely on a defined, limited set of federally recognized or TEFCA-approved, high-assurance Identity Providers (IdPs) for initial individual identity verification. This establishes a "narrow waist" for trusted identity proofing.
-2.  **Explicit, Verifiable Individual Authorization Mediated by Trusted Services:** The act of an individual authorizing an application to access their data must be a distinct, explicit step mediated by a trusted authorization service that leverages the verified identity from an approved IdP. The resulting authorization artifact (e.g., a SMART on FHIR authorization code exchanged for an access token, a FHIR Consent resource, or other digitally signed permission) must be cryptographically bound to the verified individual identity and the specific application being authorized, ensuring non-repudiation and that permissions are granted by the legitimate data subject to a specific recipient for defined purposes.
-3.  **Scoped Access Based on Authorization:** Applications, upon presenting a valid, identity-bound authorization token or artifact, are granted access only to the data permitted by that specific authorization. This principle, combined with fine-grained consent capabilities, helps limit the "blast radius" of any single compromised application or token.
-4.  **Support for Diverse IAS Provider Models, Including Non-Reciprocal Patient-Controlled Storage:** 
-    *   The TEFCA framework must explicitly acknowledge and support IAS providers that function solely as agents for patient-directed data retrieval and local/personal storage (e.g., on a patient's device or personal cloud).
-    *   Such "patient-controlled storage" IAS providers, when authorized by an individual to retrieve data on their behalf, should not be mandated to become queryable TEFCA network nodes themselves or to make the retrieved data available for reciprocal sharing via TEFCA. Their role is to facilitate the patient's right to access and personally hold their data, respecting a patient's choice to keep that consolidated data private and outside of further network exchange, unless explicitly re-authorized by the patient for a different purpose.
-5.  **Facilitation of Individual Data Retrieval within this Architecture:** Within this trustworthy and flexible framework, QHINs must provide or ensure individuals have access to functionalities enabling them to:
-    *   Discover which TEFCA participants are likely to hold their records (Record Locator Service - RLS), via user-friendly interfaces (website and API).
-    *   Initiate cost-free queries for their *own* USCDI data (and eventually their full Electronic Health Information) from all participating data holders via TEFCA.
+#### 1. **Federated Trust with Approved Identity Providers (IdPs) for All IAS:** 
+All Individual Access Service pathways, including those used by commercial providers and those facilitating the Patient-Developer Credential, must rely on a defined, limited set of federally recognized or TEFCA-approved, high-assurance Identity Providers (IdPs) for initial individual identity verification. This establishes a "narrow waist" for trusted identity proofing.
+
+#### 2. **Explicit, Verifiable Individual Authorization Mediated by Trusted Services:** 
+The act of an individual authorizing an application to access their data must be a distinct, explicit step mediated by a trusted authorization service that leverages the verified identity from an approved IdP. The resulting authorization artifact (e.g., a SMART on FHIR authorization code exchanged for an access token, a FHIR Consent resource, or other digitally signed permission) must be cryptographically bound to the verified individual identity and the specific application being authorized, ensuring non-repudiation and that permissions are granted by the legitimate data subject to a specific recipient for defined purposes.
+
+**Critical Architecture Constraints:**
+- **Applications CANNOT create identity credentials or authorization credentials** - they may only consume credentials issued by trusted services
+- **Narrow waist enforcement**: Only the limited set of approved IdPs and authorization services may issue their respective credential types
+- **Verifiability**: Relying parties (QHINs, EHRs) must be able to cryptographically verify that both identity and authorization credentials were issued by approved trusted services
+- **Security properties of binding must ensure**:
+  - Non-transferability: Authorization cannot be used by a different identity
+  - Non-forgeability: Applications cannot modify or create credentials
+  - Accountability: All credential issuance is auditable to specific trusted entities
+
+#### 3. **Scoped Access Based on Authorization:** 
+Applications, upon presenting a valid, identity-bound authorization credential, are granted access only to the data permitted by that specific authorization. This principle, combined with fine-grained consent capabilities, helps limit the "blast radius" of any single compromised application or token.
+
+#### 4. **Support for Diverse IAS Provider Models, Including Non-Reciprocal Patient-Controlled Storage:** 
+- The TEFCA framework must explicitly acknowledge and support IAS providers that function solely as agents for patient-directed data retrieval and local/personal storage (e.g., on a patient's device or personal cloud).
+- Such "patient-controlled storage" IAS providers, when authorized by an individual to retrieve data on their behalf, should not be mandated to become queryable TEFCA network nodes themselves or to make the retrieved data available for reciprocal sharing via TEFCA. Their role is to facilitate the patient's right to access and personally hold their data, respecting a patient's choice to keep that consolidated data private and outside of further network exchange, unless explicitly re-authorized by the patient for a different purpose.
+
+#### 5. **Facilitation of Individual Data Retrieval within this Architecture:** 
+Within this trustworthy and flexible framework, QHINs must provide or ensure individuals have access to functionalities enabling them to:
+- Discover which TEFCA participants are likely to hold their records (Record Locator Service - RLS), via user-friendly interfaces (website and API).
+- Initiate cost-free queries for their *own* USCDI data (and eventually their full Electronic Health Information) from all participating data holders via TEFCA.
 
 ### Establish Public Foundational Infrastructure for Nationwide Discovery | `req_public_discovery_infrastructure`
 **Recommendation:** ONC should lead or actively support the establishment, maintenance, and governance of publicly available, free, and machine-readable national directory services crucial for enabling nationwide health information exchange and interoperability.
