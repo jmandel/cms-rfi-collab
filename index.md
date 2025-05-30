@@ -111,7 +111,7 @@ Patients have a right to access their EHI without undue burden. Current manual r
 
 ### Mandate Patient-Initiated Secure Messaging via Standardized APIs | `req_patient_app_messaging_argonaut`
 **Recommendation:**
-Certified Health IT must support secure, patient-initiated messaging to healthcare providers from third-party applications, utilizing standardized APIs such as the Argonaut Project's Provider/Patient Secure Messaging API Implementation Guide (`https://hackmd.io/@argonaut/H1dQ95xG3`).
+Certified Health IT must support secure, patient-initiated messaging to healthcare providers from third-party applications, utilizing standardized APIs. Signal intent to adopt community-developed standards such as the Argonaut Project's Provider/Patient Secure Messaging API Implementation Guide (https://hackmd.io/@argonaut/H1dQ95xG3) via SVAP.
 
 **Rationale & Specifics:**
 To improve patient engagement and streamline communication within the healthcare system:
