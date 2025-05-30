@@ -108,7 +108,28 @@ Patients have a right to access their EHI without undue burden. Current manual r
 6.  **Cost-Free to Patient:** Initiating and receiving EHI through this mandated self-service electronic mechanism must be free of charge to the patient.
 7.  **Certification:** Certification testing must verify the presence, functionality, and discoverability of this self-service electronic EHI request capability, including the ability to submit a request, track status, and receive notifications entirely through electronic means.
 
-This requirement ensures a baseline level of patient empowerment and efficiency in accessing EHI, serving as an essential complement to, or foundational step towards, more advanced API-based EHI export solutions.
+
+### Mandate Patient-Initiated Secure Messaging via Standardized APIs | `req_patient_app_messaging_argonaut`
+**Recommendation:**
+Certified Health IT must support secure, patient-initiated messaging to healthcare providers from third-party applications, utilizing standardized APIs such as the Argonaut Project's Provider/Patient Secure Messaging API Implementation Guide (`https://hackmd.io/@argonaut/H1dQ95xG3`).
+
+**Rationale & Specifics:**
+To improve patient engagement and streamline communication within the healthcare system:
+1.  **Patient Convenience and Engagement:** Enables patients to communicate with their care teams directly from applications they are already using to manage their health, improving navigation of the healthcare system, reducing communication friction, and fostering continuous engagement.
+2.  **Contextual Communication:** Facilitates more effective communication by allowing patients to, for example, select specific data within an app (e.g., a portion of a clinical note they are viewing, a concerning lab result, a self-tracked observation) and easily include it as context within their secure message to the provider.
+3.  **Standardized Approach:** Adherence to community-developed standards like the Argonaut messaging API (which leverages FHIR Communication) ensures interoperability and provides a consistent, predictable interface for app developers. This includes:
+    *   Discoverable messaging endpoints.
+    *   Standardized FHIR resources for message construction and exchange.
+    *   Alignment with existing security and authorization frameworks like SMART App Launch.
+    *   Clear expectations for message payloads, including text and potentially references or attachments.
+4.  **EHR Workflow Integration:** Certified Health IT must be capable of integrating these incoming patient-initiated messages into existing provider communication workflows (e.g., EHR in-basket, designated messaging queues) to ensure they are reviewed and responded to in a timely and appropriate manner by the care team.
+5.  **Use Case Example:** A patient is reviewing a recently released clinical note in their preferred patient-facing application. They identify a section containing medical jargon they don't understand or have a question about their medication dosage. The application, using the standardized API, allows them to highlight this specific text snippet and send a secure message, with the selected text automatically included as context, directly to their provider's EHR system.
+6.  **Certification:** ONC certification testing should verify the EHR's capability to:
+    *   Expose the necessary API endpoints for receiving patient-initiated messages.
+    *   Correctly process and route messages according to the Argonaut (or similar ONC-specified) messaging IG.
+    *   Handle contextual data included with messages.
+    *   Ensure messages are appropriately presented to providers within their standard workflows.
+    *   Confirm adherence to security and authorization requirements.
 
 ### Mandate Electronic Pathways for Patient Record Amendment Requests | `req_patient_amendment_pathways`
 
@@ -116,7 +137,7 @@ This requirement ensures a baseline level of patient empowerment and efficiency 
 Certified Health IT must provide clear, secure, and entirely electronic pathways for individuals to request amendments to their medical records, track the status of these requests, and receive responses, thereby making HIPAA-granted rights more accessible and usable. These pathways must be available through patient-facing interfaces (e.g., patient portals) and programmatically via APIs for patient-authorized applications.
 
 **Rationale & Specifics:**
-Making the HIPAA right to request record amendments electronically functional is crucial for data accuracy, patient trust, and engagement. Current manual processes are often burdensome.
+Making the HIPAA right to request record amendments electronically functional is crucial for data accuracy, patient trust, and engagement. Current manual processes are often burdensome. This could be combined with the approach for "Mandate Patient-Initiated Secure Messaging via Standardized APIs". 
 
 1.  **Electronic Submission:** Patients must be able to identify information they believe is incorrect and electronically submit an amendment request with their reasoning, via patient portals and APIs for authorized apps.
 2.  **Status Tracking & Response:** The system must provide electronic confirmation of receipt, allow patients to track the request status, and deliver the provider's electronic response (acceptance or denial).
@@ -327,6 +348,7 @@ CMS's primary role should be to ensure foundational data access and protect pati
 *   [Empower Individuals with Transparency and Control Over TEFCA Data Sharing](#req_tefca_individual_transparency_control): Builds trust necessary for engagement.
 *   [Ensure Patient Access to Remote, High-Assurance Portal Account Provisioning](#req_coordinated_remote_provisioning_access): Simplifies foundational access.
 *   [Mandate Electronic Pathways for Patient Record Amendment Requests](#req_patient_amendment_pathways): Allowing patients to easily request corrections to their data via portals and apps makes digital tools more empowering and essential.
+*   [Mandate Patient-Initiated Secure Messaging via Standardized APIs](#req_patient_app_messaging_argonaut): Enabling patients to communicate with providers directly from their chosen apps, potentially with relevant data context, greatly increases the utility and stickiness of digital health products.
 
 CMS should avoid becoming an app "approver" for general health tools, which could stifle innovation. Focus on open, secure, comprehensive data pipes and core functionalities, allowing the market and patients to determine value.
 ### PC-8. In your experience, what health data is readily available and valuable to patients or their caregivers or both?
@@ -551,6 +573,7 @@ The Cures Act's vision of data being accessed, exchanged, and used "without spec
 *   [Keep Single-Patient API Certification Current with SMART App Launch & Backend Services Specifications](#req_update_smart_app_launch_cert): Ensures modern, secure, and functional single-patient API access.
 *   [Ensure Programmatic and Automated Access to Medical Images](#req_programmatic_image_access): Makes critical image data accessible without special effort.
 *   [Mandate Electronic Pathways for Patient Record Amendment Requests](#req_patient_amendment_pathways): Fulfilling the HIPAA right to request amendment "without special effort" is a crucial aspect of "using" one's health information. Current manual processes create significant burdens. Mandating certified electronic pathways (via portals and APIs) for patients to submit, track, and receive responses to amendment requests directly aligns with the Cures Act's intent to empower patients and improve data quality.
+*   [Mandate Patient-Initiated Secure Messaging via Standardized APIs](#req_patient_app_messaging_argonaut): Enabling patients to communicate with providers directly from their chosen apps, potentially with relevant data context, greatly increases the utility and stickiness of digital health products.
 
 By mandating these capabilities through the ONC Health IT Certification Program, ONC can ensure that "without special effort" becomes a practical reality for patients seeking to truly engage with and manage their complete health information.
 
