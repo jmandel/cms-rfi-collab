@@ -194,7 +194,7 @@ The fundamental goal is to make secure, online patient portal account creation a
 
 1.  **CEHRT Capability as the Technical Foundation:** ONC's certification ensures that the technology itself possesses the robust, implementable functionality for remote, high-assurance provisioning. This includes:
     *   Supporting a fully remote, electronic process.
-    *   Meeting high-assurance identity proofing standards (e.g., IAL2-comparable).
+    *   Meeting high-assurance identity proofing standards (e.g., IAL2-comparable). In routine use, patient authentication may be satisfied by on-device FIDO-based biometrics (e.g., Face ID, Touch ID, Windows Hello) that are cryptographically bound to the previously IAL2-verified identity, thereby meeting AAL2 with minimal user friction. Repeated user authentication should not be needed in the context of an ongoing authorization providing long-term access.
     *   Flexibility for CEHRT developers in how this is achieved (e.g., integration with IAL2 IdPs, or direct implementation of a compliant workflow).
     *   Certification would verify the functionality, security, integrity, and practical usability/configurability by provider organizations.
 2.  **Provider Obligation for Patient Access:** CMS's role is to ensure that providers make this ONC-certified capability operational for patients. By establishing this as an expectation for program participation:
@@ -274,7 +274,7 @@ All Individual Access Service pathways, including those used by commercial provi
 The act of an individual authorizing an application to access their data must be a distinct, explicit step mediated by a trusted authorization service that leverages the verified identity from an approved IdP. The resulting authorization artifact (e.g., a SMART on FHIR authorization code exchanged for an access token, a FHIR Consent resource, or other digitally signed permission) must be cryptographically bound to the verified individual identity and the specific application being authorized, ensuring non-repudiation and that permissions are granted by the legitimate data subject to a specific recipient for defined purposes.
 
 **Critical Architecture Constraints:**
-- **Applications CANNOT create identity credentials or authorization credentials** - they may only consume credentials issued by trusted services
+- **Applications CANNOT create identity credentials or authorization credentials** - they may only consume credentials issued by trusted services. Authorization may be digitally signed with the same private key used to present a verified mobile credential (e.g., a state-issued MDL stored in an Apple / Google wallet), so long as the signature is triggered by an on-device biometric ceremony that binds the patient’s intent to the request. An alternative is for the identity verification (IDV) service to handle authorization and consent as part of a single flow, or for separate online IDV and authorization services to be used. Any of these flows is acceptable as long as it meets the principles of a "narrow waist" and binding, as stated in the architecture constraints.
 - **Narrow waist enforcement**: Only the limited set of approved IdPs and authorization services may issue their respective credential types
 - **Verifiability**: Relying parties (QHINs, EHRs) must be able to cryptographically verify that both identity and authorization credentials were issued by approved trusted services
 - **Security properties of binding must ensure**:
@@ -283,7 +283,7 @@ The act of an individual authorizing an application to access their data must be
   - Accountability: All credential issuance is auditable to specific trusted entities
 
 #### 3. **Scoped Access Based on Authorization:** 
-Applications, upon presenting a valid, identity-bound authorization credential, are granted access only to the data permitted by that specific authorization. This principle, combined with fine-grained consent capabilities, helps limit the "blast radius" of any single compromised application or token.
+Applications, upon presenting a valid, identity-bound authorization credential, are granted access only to the data permitted by that specific authorization. This principle, combined with fine-grained consent capabilities, helps limit the "blast radius" of any single compromised application or token. Repeated user authentication should not be needed in the context of an ongoing authorization providing long-term network-based access in TEFCA.
 
 #### 4. **Support for Diverse IAS Provider Models, Including Non-Reciprocal Patient-Controlled Storage:** 
 - The TEFCA framework must explicitly acknowledge and support IAS providers that function solely as agents for patient-directed data retrieval and local/personal storage (e.g., on a patient's device or personal cloud).
