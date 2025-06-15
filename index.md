@@ -67,7 +67,7 @@ To ensure the regulated Bulk FHIR API is a viable and primary mechanism for popu
 ### Mandate API-Accessible, Computable Full EHI Export, Aligning with Industry Specifications | `req_api_ehi_export_argonaut`
 
 **Recommendation:**
-1. Certified Health IT must provide a robust, functional, and *computable* "Electronic Health Information" (EHI) Export for single patients. This EHI export *must* be available via a standardized API, aligning with or providing functionality equivalent to the Argonaut Project's EHI Export API Implementation Guide, to allow for automated retrieval by patient-authorized applications. This serves as a comprehensive backstop for any information not available through USCDI FHIR APIs and must include structured and unstructured data, along with necessary vendor documentation for interpretation.
+1. Certified Health IT must provide a robust, functional, and *computable* "Electronic Health Information" (EHI) Export for single patients. This EHI export *must* be available via a standardized API, aligning with or providing functionality equivalent to the [Argonaut Project's EHI Export API Implementation Guide](https://build.fhir.org/ig/argonautproject/ehi-api/ehi-export.html), to allow for automated retrieval by patient-authorized applications. This serves as a comprehensive backstop for any information not available through USCDI FHIR APIs and must include structured and unstructured data, along with necessary vendor documentation for interpretation.
 2. In addition to providing access to a computable EHI export through the API, systems *must* also offer patients an API endpoint to export the full HIPAA designated record set in a human readable form. 
 
 **Rationale & Specifics:**
@@ -156,7 +156,7 @@ This ensures patients can exercise their amendment rights efficiently through mo
 Certified Health IT must implement support for a defined starter set of FHIR Subscription topics to enable event-driven data synchronization and application workflows, reducing inefficient polling and supporting timely notifications.
 **Rationale & Specifics:**
 Real-time awareness of data changes is crucial for many clinical and patient-facing applications.
-1.  **Core Subscription Topics:** At a minimum, support should include topics such as "Patient data updates" (for changes to key USCDI resources associated with a patient) and "Encounter data update" (for new or updated encounters). ONC should align these with industry efforts like the Argonaut Project's US Core Patient Data feed design.
+1.  **Core Subscription Topics:** At a minimum, support should include topics such as "Patient data updates" (for changes to key USCDI resources associated with a patient) and "Encounter data update" (for new or updated encounters). ONC should align these with industry efforts like the Argonaut Project's US Core Patient Data feed design (https://build.fhir.org/ig/HL7/US-Core/patient-data-feed.html).
 2.  **Technical Standards:** Implementations should align with stable versions of FHIR Subscription specifications (e.g., FHIR R4 Subscriptions Backport IG).
 3.  **Use Cases:** This enables use cases like patient apps receiving updates without constant polling, public health systems being notified of reportable encounters, and clinical systems triggering workflows based on new data availability.
 4.  **Certification:** Testing should verify the ability to create subscriptions to defined topics and receive notifications when corresponding events occur.
@@ -179,7 +179,7 @@ Medical images are critical clinical data, yet their accessibility via APIs has 
 1.  **Standardized API Access:** Access should be facilitated via standardized APIs (e.g., DICOMweb for image retrieval) referenced from FHIR resources (e.g., an ImagingStudy resource containing DICOMweb endpoints).
 2.  **Consistent Authorization:** Image access must use the same SMART on FHIR authorization mechanisms as used for other clinical data, ensuring a consistent security model for applications.
 3.  **Avoidance of Non-Programmatic "Links":** The requirement is for truly programmatic access, not just "imaging links" within a portal that may be context-bound, require manual user interaction to dereference, or are not shareable with third-party applications.
-4.  **Industry Alignment:** Encourage alignment with industry efforts such as the Argonaut Project's Imaging Access specifications.
+4.  **Industry Alignment:** Encourage alignment with industry efforts such as the Argonaut Project's Imaging Access specifications (https://github.com/sync-for-science/imaging).
 5.  **Certification:** Testing should verify that an authorized application can discover available imaging studies for a patient via FHIR and then programmatically retrieve diagnostic quality images using the specified APIs and authorization flow.
 
 ### Ensure Patient Access to Remote, High-Assurance Portal Account Provisioning | `req_coordinated_remote_provisioning_access`
